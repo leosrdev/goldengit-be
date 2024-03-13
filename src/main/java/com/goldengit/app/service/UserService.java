@@ -45,4 +45,8 @@ public class UserService {
                 .name(value.getName())
                 .email(value.getEmail()).build()).orElse(null);
     }
+
+    public void deleteUserById(String id) {
+        userRepository.deleteById(id);
+    }
 }

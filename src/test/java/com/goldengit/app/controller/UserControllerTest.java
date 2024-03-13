@@ -2,6 +2,7 @@ package com.goldengit.app.controller;
 
 import com.goldengit.app.dto.UserRequest;
 import com.goldengit.app.dto.UserResponse;
+import org.bson.assertions.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -47,6 +48,20 @@ class UserControllerTest extends BaseControllerTest {
                         .get("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(status().isOk());
+    }
+
+
+    @Test
+    void shouldDeleteById() throws Exception {
+        UserRequest userRequest = getUserRequest();
+        UserResponse userResponse = userService.createUser(userRequest);
+
+        Assertions.assertNotNull(userResponse.getId());
+        mockMvc.perform(
+                MockMvcRequestBuilders
+                        .delete("/api/users/" + userResponse.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isNoContent());
     }
 
     private UserRequest getUserRequest() {
