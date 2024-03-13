@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.goldengit</groupId>
-	<artifactId>app</artifactId>
+	<artifactId>goldengit</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>app</name>
+	<name>goldengit</name>
 	<description>Insights for git repositories</description>
 	<properties>
 		<java.version>17</java.version>
