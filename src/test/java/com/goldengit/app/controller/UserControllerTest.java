@@ -1,4 +1,4 @@
-package com.goldengit.app;
+package com.goldengit.app.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.goldengit.app.dto.UserRequest;
@@ -23,23 +23,7 @@ import org.testcontainers.utility.DockerImageName;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-@Testcontainers
-@AutoConfigureMockMvc
-class UserControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-    @Autowired
-    private ObjectMapper objectMapper;
-    @Autowired
-    private UserService userService;
-    @Container
-    static MongoDBContainer mongoDBContainer = new MongoDBContainer(DockerImageName.parse("mongo:4.0.10"));
-
-    @DynamicPropertySource
-    static void setProperties(DynamicPropertyRegistry dynamicPropertyRegistry) {
-        dynamicPropertyRegistry.add("spring.data.mongodb.uri", mongoDBContainer::getReplicaSetUrl);
-    }
+class UserControllerTest extends BaseControllerTest {
 
     @Test
     void shouldCreateUser() throws Exception {
