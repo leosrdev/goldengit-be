@@ -2,7 +2,7 @@ package com.goldengit.app.controller;
 
 import com.goldengit.app.dto.UserRequest;
 import com.goldengit.app.dto.UserResponse;
-import org.bson.assertions.Assertions;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -29,7 +29,7 @@ class UserControllerTest extends BaseControllerTest {
     @Test
     void shouldFindById() throws Exception {
         UserRequest userRequest = getUserRequest();
-        UserResponse userResponse = userService.createUser(userRequest);
+        UserResponse userResponse = userService.save(userRequest);
 
         mockMvc.perform(
                 MockMvcRequestBuilders
@@ -41,7 +41,7 @@ class UserControllerTest extends BaseControllerTest {
     @Test
     void shouldListUsers() throws Exception {
         UserRequest userRequest = getUserRequest();
-        userService.createUser(userRequest);
+        userService.save(userRequest);
 
         mockMvc.perform(
                 MockMvcRequestBuilders
@@ -54,7 +54,7 @@ class UserControllerTest extends BaseControllerTest {
     @Test
     void shouldDeleteById() throws Exception {
         UserRequest userRequest = getUserRequest();
-        UserResponse userResponse = userService.createUser(userRequest);
+        UserResponse userResponse = userService.save(userRequest);
 
         Assertions.assertNotNull(userResponse.getId());
         mockMvc.perform(
@@ -62,6 +62,7 @@ class UserControllerTest extends BaseControllerTest {
                         .delete("/api/users/" + userResponse.getId())
                         .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(status().isNoContent());
+        Assertions.assertNull(userService.findById(userResponse.getId()));
     }
 
     private UserRequest getUserRequest() {

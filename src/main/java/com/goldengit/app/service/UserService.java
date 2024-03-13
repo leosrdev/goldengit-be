@@ -17,7 +17,7 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public UserResponse createUser(UserRequest userRequest) {
+    public UserResponse save(UserRequest userRequest) {
         User user = User.builder()
                 .name(userRequest.getName())
                 .email(userRequest.getEmail())
@@ -31,14 +31,14 @@ public class UserService {
                 .build();
     }
 
-    public List<UserResponse> listUsers() {
+    public List<UserResponse> findAll() {
         return userRepository.findAll().stream().map(user -> UserResponse.builder()
                 .id(user.getId())
                 .name(user.getName())
                 .email(user.getEmail()).build()).toList();
     }
 
-    public UserResponse getUserById(String id) {
+    public UserResponse findById(String id) {
         Optional<User> user = userRepository.findById(id);
         return user.map(value -> UserResponse.builder()
                 .id(value.getId())
@@ -46,7 +46,7 @@ public class UserService {
                 .email(value.getEmail()).build()).orElse(null);
     }
 
-    public void deleteUserById(String id) {
+    public void deleteById(String id) {
         userRepository.deleteById(id);
     }
 }

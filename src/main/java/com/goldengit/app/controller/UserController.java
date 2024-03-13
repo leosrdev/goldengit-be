@@ -22,7 +22,7 @@ public class UserController {
     @PostMapping
         public ResponseEntity<UserResponse> createUser(@RequestBody UserRequest userRequest) {
         try {
-            UserResponse userResponse = userService.createUser(userRequest);
+            UserResponse userResponse = userService.save(userRequest);
             return ResponseEntity.status(HttpStatus.CREATED).body(userResponse);
         } catch (Exception exception) {
             log.error(exception.getMessage());
@@ -32,12 +32,12 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<List<UserResponse>> listUsers() {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.listUsers());
+        return ResponseEntity.status(HttpStatus.OK).body(userService.findAll());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getUserById(@PathVariable String id) {
-        UserResponse userResponse = userService.getUserById(id);
+        UserResponse userResponse = userService.findById(id);
         if (userResponse != null) {
             return ResponseEntity.status(HttpStatus.OK).body(userResponse);
         }
@@ -46,7 +46,7 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<UserResponse> deleteById(@PathVariable String id) {
-        userService.deleteUserById(id);
+        userService.deleteById(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
