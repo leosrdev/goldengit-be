@@ -20,13 +20,13 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-        public ResponseEntity<String> createUser(@RequestBody UserRequest userRequest) {
+        public ResponseEntity<UserResponse> createUser(@RequestBody UserRequest userRequest) {
         try {
-            userService.createUser(userRequest);
-            return ResponseEntity.status(HttpStatus.CREATED).body("success");
+            UserResponse userResponse = userService.createUser(userRequest);
+            return ResponseEntity.status(HttpStatus.CREATED).body(userResponse);
         } catch (Exception exception) {
             log.error(exception.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("We could not process your request, please try again later.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 

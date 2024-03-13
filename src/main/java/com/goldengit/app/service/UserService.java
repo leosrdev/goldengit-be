@@ -17,13 +17,18 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public void createUser(UserRequest userRequest) {
+    public UserResponse createUser(UserRequest userRequest) {
         User user = User.builder()
                 .name(userRequest.getName())
                 .email(userRequest.getEmail())
                 .password(userRequest.getPassword()).build();
 
-        userRepository.save(user);
+        User userCreated = userRepository.save(user);
+        return UserResponse.builder()
+                .id(userCreated.getId())
+                .name(userCreated.getName())
+                .email(userCreated.getEmail())
+                .build();
     }
 
     public List<UserResponse> listUsers() {
