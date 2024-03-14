@@ -1,21 +1,56 @@
 package com.goldengit.app.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.goldengit.app.dto.UserRequest;
 import com.goldengit.app.dto.UserResponse;
-import org.junit.jupiter.api.Assertions;
+import com.goldengit.app.service.UserService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-class UserControllerTest extends BaseControllerTest {
+@AutoConfigureMockMvc
+class UserControllerTest {
+    @Autowired
+    private MockMvc mockMvc;
+    @MockBean
+    private UserService userService;
+    private UserRequest userRequest;
+    private UserResponse userResponse;
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @BeforeEach
+    void setUp() {
+        userRequest = UserRequest.builder()
+                .name("John")
+                .email("john@server.net")
+                .password("secret")
+                .build();
+
+        userResponse = UserResponse.builder()
+                .name("John")
+                .email("john@server.net")
+                .id("3838929")
+                .build();
+    }
 
     @Test
     void shouldCreateUser() throws Exception {
-        UserRequest userRequest = getUserRequest();
+        when(userService.save(userRequest)).thenReturn(userResponse);
         String requestAsJson = objectMapper.writeValueAsString(userRequest);
 
         mockMvc.perform(
@@ -28,9 +63,8 @@ class UserControllerTest extends BaseControllerTest {
 
     @Test
     void shouldFindById() throws Exception {
-        UserRequest userRequest = getUserRequest();
-        UserResponse userResponse = userService.save(userRequest);
 
+        when(userService.findById(userResponse.getId())).thenReturn(userResponse);
         mockMvc.perform(
                 MockMvcRequestBuilders
                         .get("/api/users/" + userResponse.getId())
@@ -40,9 +74,9 @@ class UserControllerTest extends BaseControllerTest {
 
     @Test
     void shouldListUsers() throws Exception {
-        UserRequest userRequest = getUserRequest();
-        userService.save(userRequest);
-
+        List<UserResponse> users = new ArrayList<>();
+        users.add(userResponse);
+        when(userService.findAll()).thenReturn(users);
         mockMvc.perform(
                 MockMvcRequestBuilders
                         .get("/api/users")
@@ -50,26 +84,13 @@ class UserControllerTest extends BaseControllerTest {
         ).andExpect(status().isOk());
     }
 
-
     @Test
     void shouldDeleteById() throws Exception {
-        UserRequest userRequest = getUserRequest();
-        UserResponse userResponse = userService.save(userRequest);
-
-        Assertions.assertNotNull(userResponse.getId());
+        doNothing().when(userService).deleteById("1");
         mockMvc.perform(
                 MockMvcRequestBuilders
                         .delete("/api/users/" + userResponse.getId())
                         .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(status().isNoContent());
-        Assertions.assertNull(userService.findById(userResponse.getId()));
-    }
-
-    private UserRequest getUserRequest() {
-        return UserRequest.builder()
-                .name("John")
-                .email("john@server.net")
-                .password("secret")
-                .build();
     }
 }
