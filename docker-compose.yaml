@@ -1,13 +1,6 @@
 version: '3.1'
 services:
 
-  jenkins:
-    image: jenkins/jenkins:lts-jdk17
-    ports:
-      - 8083:8080
-    volumes:
-      - jenkins_home:/var/jenkins_home
-
   mongodb:
     image: mongo:7.0.6
     ports:
