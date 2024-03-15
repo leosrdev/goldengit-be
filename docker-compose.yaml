@@ -27,7 +27,5 @@ services:
       - mongodb
 
 volumes:
-  jenkins_home:
-    driver: local
   mongodb_data:
     driver: local
