@@ -1,6 +1,6 @@
-package com.goldengit.app.repository;
+package com.goldengit.web.repository;
 
-import com.goldengit.app.model.User;
+import com.goldengit.web.model.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface UserRepository extends MongoRepository<User, String> {

@@ -1,8 +1,8 @@
-package com.goldengit.app.controller;
+package com.goldengit.web.controller;
 
-import com.goldengit.app.dto.UserRequest;
-import com.goldengit.app.dto.UserResponse;
-import com.goldengit.app.service.UserService;
+import com.goldengit.web.dto.UserRequest;
+import com.goldengit.web.dto.UserResponse;
+import com.goldengit.web.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

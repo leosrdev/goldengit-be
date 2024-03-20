@@ -1,9 +1,9 @@
-package com.goldengit.app.service;
+package com.goldengit.web.service;
 
-import com.goldengit.app.dto.UserRequest;
-import com.goldengit.app.dto.UserResponse;
-import com.goldengit.app.model.User;
-import com.goldengit.app.repository.UserRepository;
+import com.goldengit.web.dto.UserRequest;
+import com.goldengit.web.dto.UserResponse;
+import com.goldengit.web.model.User;
+import com.goldengit.web.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

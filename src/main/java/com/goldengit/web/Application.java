@@ -1,4 +1,4 @@
-package com.goldengit.app;
+package com.goldengit.web;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
