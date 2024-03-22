@@ -1,0 +1,20 @@
+package com.goldengit.web.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class PullRequestResponse {
+    private int id;
+    private int number;
+    private String createdAt;
+    private String closedAt;
+    private String title;
+    private String state;
+    private String body;
+}

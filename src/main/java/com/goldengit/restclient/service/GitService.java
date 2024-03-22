@@ -1,7 +1,9 @@
 package com.goldengit.restclient.service;
 
 import com.goldengit.restclient.repository.GitRepository;
+import com.goldengit.restclient.schema.PullRequest;
 import com.goldengit.restclient.schema.Repositories;
+import com.goldengit.web.dto.PullRequestResponse;
 import com.goldengit.web.dto.RepoResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,6 +33,21 @@ public class GitService {
                         .openIssues(repository.open_issues_count)
                         .build()
         ).collect(Collectors.toList());
+    }
 
+    public List<PullRequestResponse> findPullRequestByRepoName(String fullName) {
+        List<PullRequest> pullRequests = gitRepository.findPullRequestByRepoName(fullName);
+
+        return pullRequests.stream().map(pullRequest ->
+                PullRequestResponse.builder()
+                        .id(pullRequest.id)
+                        .number(pullRequest.number)
+                        .title(pullRequest.title)
+                        .state(pullRequest.state)
+                        .createdAt(pullRequest.created_at)
+                        .closedAt(pullRequest.closed_at)
+                        .body(pullRequest.body)
+                        .build()
+        ).collect(Collectors.toList());
     }
 }
