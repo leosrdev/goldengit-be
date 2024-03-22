@@ -27,6 +27,7 @@ public class GitService {
                         .stars(repository.stargazers_count)
                         .forks(repository.forks_count)
                         .watchers(repository.watchers_count)
+                        .defaultBranch(repository.default_branch)
                         .openIssues(repository.open_issues_count)
                         .build()
         ).collect(Collectors.toList());

@@ -18,4 +18,5 @@ public class RepoResponse {
     private int forks;
     private int watchers;
     private int openIssues;
+    private String defaultBranch;
 }

@@ -9,4 +9,5 @@ public class Repository {
     public int watchers_count;
     public int forks_count;
     public int open_issues_count;
+    public String default_branch;
 }
