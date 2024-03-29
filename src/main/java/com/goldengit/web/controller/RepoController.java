@@ -7,29 +7,26 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/repos")
 @RequiredArgsConstructor
 public class RepoController {
 
     @Autowired
     private final GitService gitService;
 
-    @GetMapping("/repos")
+    @GetMapping("/")
     public List<RepoResponse> getRepoByQuery(@RequestParam("q") String query) {
         return gitService.findRepoByQuery(query);
     }
 
-    @GetMapping("/repos/pulls")
-    public ResponseEntity<List<PullRequestResponse>> getPullRequests(@RequestParam("repoFullName") String repoFullName) {
-        List<PullRequestResponse> pullRequests = gitService.findPullRequestByRepoName(repoFullName);
+    @GetMapping("/{owner}/{repo}/pulls")
+    public ResponseEntity<List<PullRequestResponse>> getPullRequests(@PathVariable("owner") String owner, @PathVariable("repo") String repo) {
+        List<PullRequestResponse> pullRequests = gitService.findPullRequestByRepoName(owner, repo);
         if (pullRequests != null && !pullRequests.isEmpty()) {
             return ResponseEntity.status(HttpStatus.OK).body(pullRequests);
         }

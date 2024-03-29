@@ -10,8 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class RepoResponse {
-    private int id;
-    private String name;
     private String fullName;
     private String description;
     private int stars;

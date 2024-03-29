@@ -1,6 +1,6 @@
 package com.goldengit.restclient.service;
 
-import com.goldengit.restclient.repository.GitHubAPI;
+import com.goldengit.restclient.api.GitHubAPI;
 import com.goldengit.restclient.schema.PullRequest;
 import com.goldengit.restclient.schema.Repositories;
 import com.goldengit.web.dto.PullRequestResponse;
@@ -22,8 +22,6 @@ public class GitService {
 
         return repositories.getItems().stream().map(repository ->
                 RepoResponse.builder()
-                        .id(repository.id)
-                        .name(repository.name)
                         .fullName(repository.full_name)
                         .description(repository.description)
                         .stars(repository.stargazers_count)
@@ -35,8 +33,8 @@ public class GitService {
         ).collect(Collectors.toList());
     }
 
-    public List<PullRequestResponse> findPullRequestByRepoName(String fullName) {
-        List<PullRequest> pullRequests = gitApi.findPullRequestByRepoName(fullName);
+    public List<PullRequestResponse> findPullRequestByRepoName(String owner, String repo) {
+        List<PullRequest> pullRequests = gitApi.findPullRequestByRepoName(owner, repo);
 
         return pullRequests.stream().map(pullRequest ->
                 PullRequestResponse.builder()

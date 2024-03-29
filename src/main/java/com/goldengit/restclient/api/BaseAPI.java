@@ -1,4 +1,4 @@
-package com.goldengit.restclient.repository;
+package com.goldengit.restclient.api;
 
 import org.springframework.beans.factory.annotation.Value;
 

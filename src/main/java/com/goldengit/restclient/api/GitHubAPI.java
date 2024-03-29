@@ -1,4 +1,4 @@
-package com.goldengit.restclient.repository;
+package com.goldengit.restclient.api;
 
 import com.goldengit.restclient.schema.PullRequest;
 import com.goldengit.restclient.schema.Repositories;
@@ -29,12 +29,12 @@ public class GitHubAPI extends BaseAPI {
                 .block();
     }
 
-    public List<PullRequest> findPullRequestByRepoName(String fullName) {
+    public List<PullRequest> findPullRequestByRepoName(String owner, String repo) {
         PullRequest[] pullRequests = null;
         try {
             pullRequests = webClientBuilder.build()
                     .get()
-                    .uri(String.format("https://api.github.com/repos/%s/pulls", fullName))
+                    .uri(String.format("https://api.github.com/repos/%s/%s/pulls", owner, repo))
                     .accept(MediaType.APPLICATION_JSON)
                     .headers(httpHeaders -> httpHeaders.setBearerAuth(apiToken))
                     .retrieve()
