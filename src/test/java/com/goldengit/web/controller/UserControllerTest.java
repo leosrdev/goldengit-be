@@ -55,7 +55,7 @@ class UserControllerTest {
 
         mockMvc.perform(
                 MockMvcRequestBuilders
-                        .post("/api/users")
+                        .post("/api/v1/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestAsJson)
         ).andExpect(status().isCreated());
@@ -67,7 +67,7 @@ class UserControllerTest {
         when(userService.findById(userResponse.getId())).thenReturn(userResponse);
         mockMvc.perform(
                 MockMvcRequestBuilders
-                        .get("/api/users/" + userResponse.getId())
+                        .get("/api/v1/users/" + userResponse.getId())
                         .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(status().isOk());
     }
@@ -79,7 +79,7 @@ class UserControllerTest {
         when(userService.findAll()).thenReturn(users);
         mockMvc.perform(
                 MockMvcRequestBuilders
-                        .get("/api/users")
+                        .get("/api/v1/users")
                         .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(status().isOk());
     }
@@ -89,7 +89,7 @@ class UserControllerTest {
         doNothing().when(userService).deleteById("1");
         mockMvc.perform(
                 MockMvcRequestBuilders
-                        .delete("/api/users/" + userResponse.getId())
+                        .delete("/api/v1/users/" + userResponse.getId())
                         .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(status().isNoContent());
     }
