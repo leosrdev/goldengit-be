@@ -6,6 +6,7 @@ import com.goldengit.restclient.schema.Repositories;
 import com.goldengit.web.dto.PullRequestResponse;
 import com.goldengit.web.dto.RepoResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,6 +18,7 @@ public class GitService {
 
     private final GitHubAPI gitApi;
 
+    @Cacheable("git-repositories")
     public List<RepoResponse> findRepoByQuery(String query) {
         Repositories repositories = gitApi.findRepoByQuery(query);
 
