@@ -1,12 +1,14 @@
-package com.goldengit.restclient.config;
+package com.goldengit.web.config;
 
 import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-@Component
-public class Configuration {
+@Configuration
+public class AppConfig implements WebMvcConfigurer {
     @Bean
     public WebClient.Builder getWebClientBuilder() {
         final int size = 16 * 1024 * 1024;
@@ -15,5 +17,9 @@ public class Configuration {
                 .build();
         return WebClient.builder()
                 .exchangeStrategies(strategies);
+    }
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor( new ApiBandwidthHandler());
     }
 }

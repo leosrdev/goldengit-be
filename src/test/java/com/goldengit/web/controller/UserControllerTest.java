@@ -1,6 +1,7 @@
 package com.goldengit.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.goldengit.web.config.AppConfig;
 import com.goldengit.web.dto.UserRequest;
 import com.goldengit.web.dto.UserResponse;
 import com.goldengit.web.service.UserService;
@@ -13,6 +14,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,11 +23,13 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
+@SpringBootTest(classes = {AppConfig.class, UserController.class, ObjectMapper.class})
 @AutoConfigureMockMvc
 class UserControllerTest {
-    @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private UserController userController;
     @MockBean
     private UserService userService;
     private UserRequest userRequest;
@@ -35,6 +39,9 @@ class UserControllerTest {
 
     @BeforeEach
     void setUp() {
+        mockMvc = MockMvcBuilders.standaloneSetup(userController)
+                .build();
+
         userRequest = UserRequest.builder()
                 .name("John")
                 .email("john@server.net")

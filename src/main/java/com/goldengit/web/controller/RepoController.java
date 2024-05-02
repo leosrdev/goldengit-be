@@ -3,8 +3,7 @@ package com.goldengit.web.controller;
 import com.goldengit.restclient.service.GitService;
 import com.goldengit.web.dto.PullRequestResponse;
 import com.goldengit.web.dto.RepoResponse;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,15 +12,14 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/repos")
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class RepoController {
 
-    @Autowired
     private final GitService gitService;
 
-    @GetMapping("/")
-    public List<RepoResponse> getRepoByQuery(@RequestParam("q") String query) {
-        return gitService.findRepoByQuery(query);
+    @GetMapping("/search")
+    public ResponseEntity<List<RepoResponse>> getRepoByQuery(@RequestParam("q") String query) {
+        return ResponseEntity.ok(gitService.findRepoByQuery(query));
     }
 
     @GetMapping("/{owner}/{repo}/pulls")
