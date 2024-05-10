@@ -57,7 +57,7 @@ class UserControllerTest {
         userResponse = UserResponse.builder()
                 .name("John")
                 .email("john@server.net")
-                .id("1")
+                .id(1)
                 .build();
 
         user = User.builder().name("John")
@@ -68,7 +68,7 @@ class UserControllerTest {
 
     @Test
     void shouldCreateUser() throws Exception {
-        when(userRepository.save(user)).thenReturn(user.toBuilder().id("1").build());
+        when(userRepository.save(user)).thenReturn(user.toBuilder().id(1).build());
         String requestAsJson = objectMapper.writeValueAsString(userRequest);
 
         MockHttpServletResponse response = mockMvc.perform(
@@ -83,7 +83,7 @@ class UserControllerTest {
 
     @Test
     void shouldFindById() throws Exception {
-        when(userRepository.findById("1")).thenReturn(Optional.of(user.toBuilder().id("1").build()));
+        when(userRepository.findById(1)).thenReturn(Optional.of(user.toBuilder().id(1).build()));
         MockHttpServletResponse response = mockMvc.perform(
                 MockMvcRequestBuilders
                         .get("/api/v1/users/1")
@@ -96,7 +96,7 @@ class UserControllerTest {
 
     @Test
     void shouldListUsers() throws Exception {
-        when(userRepository.findAll()).thenReturn(List.of(user.toBuilder().id("1").build()));
+        when(userRepository.findAll()).thenReturn(List.of(user.toBuilder().id(1).build()));
         MockHttpServletResponse response = mockMvc.perform(
                 MockMvcRequestBuilders
                         .get("/api/v1/users")
@@ -109,7 +109,7 @@ class UserControllerTest {
 
     @Test
     void shouldDeleteById() throws Exception {
-        doNothing().when(userRepository).deleteById("1");
+        doNothing().when(userRepository).deleteById(1);
         MockHttpServletResponse response = mockMvc.perform(
                 MockMvcRequestBuilders
                         .delete("/api/v1/users/1")

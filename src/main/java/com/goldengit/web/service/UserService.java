@@ -7,6 +7,7 @@ import com.goldengit.web.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,13 +32,18 @@ public class UserService {
     }
 
     public List<UserResponse> findAll() {
-        return userRepository.findAll().stream().map(user -> UserResponse.builder()
-                .id(user.getId())
-                .name(user.getName())
-                .email(user.getEmail()).build()).toList();
+        var users = userRepository.findAll();
+        List<UserResponse> userResponses = new ArrayList<>();
+        users.forEach(user ->
+                userResponses.add(UserResponse.builder()
+                        .id(user.getId())
+                        .name(user.getName())
+                        .email(user.getEmail()).build())
+        );
+        return userResponses;
     }
 
-    public UserResponse findById(String id) {
+    public UserResponse findById(Integer id) {
         Optional<User> user = userRepository.findById(id);
         return user.map(value -> UserResponse.builder()
                 .id(value.getId())
@@ -45,7 +51,7 @@ public class UserService {
                 .email(value.getEmail()).build()).orElse(null);
     }
 
-    public void deleteById(String id) {
+    public void deleteById(Integer id) {
         userRepository.deleteById(id);
     }
 }

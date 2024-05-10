@@ -1,7 +1,7 @@
 package com.goldengit.web.repository;
 
 import com.goldengit.web.model.User;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.repository.CrudRepository;
 
-public interface UserRepository extends MongoRepository<User, String> {
+public interface UserRepository extends CrudRepository<User, Integer> {
 }
