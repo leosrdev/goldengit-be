@@ -9,13 +9,12 @@
 ## Setting the environment variables
 Set the following env vars to run the application locally:
 
-| Variable                | Description                                   |
-|-------------------------|-----------------------------------------------|
-| ```DEV_ENV_USERNAME```  | The master user name to execute the API calls |
-| ```DEV_ENV_PASS```      | The master password to execute the API calls  |
-| ```GITHUB_API_TOKEN```  | The API token used to consume the GitHub API  |
-| ```MONGODB_URL```       | The local MongoDB URL                         |
-| ```OPENAI_API_KEY```    | The API key used to consume the OpenAI API    |
+| Variable                 | Description                                  |
+|--------------------------|----------------------------------------------|
+| ```GITHUB_API_TOKEN```   | The API token used to consume the GitHub API |
+| ```MYSQL_USER```         | The MySQL username                           |
+| ```MYSQL_PASSWORD```     | The MySQL password                           |
+| ```OPENAI_API_KEY```     | The key used to consume the OpenAI API       |
 
 ## Docker compose
 Run the Docker compose with the environment variables defined inside the docker-compose.yaml file
