@@ -3,6 +3,7 @@ package com.goldengit.web.controller;
 import com.goldengit.web.dto.UserRequest;
 import com.goldengit.web.dto.UserResponse;
 import com.goldengit.web.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -20,7 +21,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<UserResponse> createUser(@RequestBody UserRequest userRequest) {
+    public ResponseEntity<UserResponse> createUser(@Valid @RequestBody UserRequest userRequest) {
         try {
             UserResponse userResponse = userService.save(userRequest);
             return ResponseEntity.status(HttpStatus.CREATED).body(userResponse);

@@ -5,6 +5,7 @@ import com.goldengit.web.dto.UserResponse;
 import com.goldengit.web.model.User;
 import com.goldengit.web.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -16,12 +17,14 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public UserResponse save(UserRequest userRequest) {
         User user = User.builder()
                 .name(userRequest.getName())
                 .email(userRequest.getEmail())
-                .password(userRequest.getPassword()).build();
+                .password(passwordEncoder.encode(userRequest.getPassword()))
+                .build();
 
         User userCreated = userRepository.save(user);
         return UserResponse.builder()

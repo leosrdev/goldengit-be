@@ -18,8 +18,9 @@ public class AppConfig implements WebMvcConfigurer {
         return WebClient.builder()
                 .exchangeStrategies(strategies);
     }
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor( new ApiBandwidthHandler());
+        registry.addInterceptor(new ApiBandwidthHandler());
     }
 }
