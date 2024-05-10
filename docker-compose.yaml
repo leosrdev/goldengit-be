@@ -1,40 +1,32 @@
 version: '3.1'
 services:
 
-  mongodb:
-    image: mongo:7.0.6
+  mysql:
+    image: mysql:8.4.0
     ports:
-      - 27017:27017
-    restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ADMIN_USER}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ADMIN_PASS}
+      - "3306:3306"
     volumes:
-      - mongodb_data:/data/db
+      - mysql_data:/var/lib/mysql
 
-  mongo-express:
-    image: mongo-express:1.0.2-20-alpine3.19
+  phpmyadmin:
+    image: phpmyadmin:5.2.1-apache
     restart: always
     ports:
-      - 8085:8081
+      - "3000:80"
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_ADMIN_USER}
-      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_ADMIN_PASS}
-      ME_CONFIG_MONGODB_URL: ${ME_CONFIG_MONGODB_URL}
-      ME_CONFIG_BASICAUTH_USERNAME: ${ME_CONFIG_BASICAUTH_USERNAME}
-      ME_CONFIG_BASICAUTH_PASSWORD: ${ME_CONFIG_BASICAUTH_PASSWORD}
+      PMA_HOST: mysql
     depends_on:
-      - mongodb
+      - mysql
 
   redis-server:
     image: redis:7.2.4
     restart: always
     ports:
-      - 6379:6379
+      - "6379:6379"
     volumes:
       - redis_data:/data
 
 volumes:
-  mongodb_data:
+  mysql_data:
     driver: local
   redis_data:
