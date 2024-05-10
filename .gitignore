@@ -15,5 +15,8 @@
 log/
 target/
 
-#Docker compose secrets file
+# Credentials file
 dev_env.txt
+
+# MySQL scripts
+MySQL-scripts.sql
