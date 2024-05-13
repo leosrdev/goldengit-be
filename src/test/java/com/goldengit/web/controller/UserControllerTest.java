@@ -1,11 +1,9 @@
 package com.goldengit.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.goldengit.web.config.AppConfig;
+import com.goldengit.web.config.WebConfig;
 import com.goldengit.web.dto.UserRequest;
 import com.goldengit.web.dto.UserResponse;
-import com.goldengit.web.model.User;
-import com.goldengit.web.repository.UserRepository;
 import com.goldengit.web.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,25 +19,32 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
-@SpringBootTest(classes = {AppConfig.class, UserController.class, UserService.class, ObjectMapper.class})
+
+@SpringBootTest(classes =
+        {
+                WebConfig.class,
+                UserService.class,
+                UserController.class,
+                ObjectMapper.class,
+        }
+)
 @AutoConfigureMockMvc
 class UserControllerTest {
+
     private MockMvc mockMvc;
 
     @Autowired
     private UserController userController;
     @MockBean
-    private UserRepository userRepository;
+    private UserService userService;
     private UserRequest userRequest;
     private UserResponse userResponse;
-    private User user;
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -59,16 +64,11 @@ class UserControllerTest {
                 .email("john@server.net")
                 .id(1)
                 .build();
-
-        user = User.builder().name("John")
-                .email("john@server.net")
-                .password("secret")
-                .build();
     }
 
     @Test
     void shouldCreateUser() throws Exception {
-        when(userRepository.save(user)).thenReturn(user.toBuilder().id(1).build());
+        when(userService.save(userRequest)).thenReturn(userResponse);
         String requestAsJson = objectMapper.writeValueAsString(userRequest);
 
         MockHttpServletResponse response = mockMvc.perform(
@@ -83,7 +83,7 @@ class UserControllerTest {
 
     @Test
     void shouldFindById() throws Exception {
-        when(userRepository.findById(1)).thenReturn(Optional.of(user.toBuilder().id(1).build()));
+        when(userService.findById(1)).thenReturn(userResponse);
         MockHttpServletResponse response = mockMvc.perform(
                 MockMvcRequestBuilders
                         .get("/api/v1/users/1")
@@ -96,7 +96,7 @@ class UserControllerTest {
 
     @Test
     void shouldListUsers() throws Exception {
-        when(userRepository.findAll()).thenReturn(List.of(user.toBuilder().id(1).build()));
+        when(userService.findAll()).thenReturn(List.of(userResponse));
         MockHttpServletResponse response = mockMvc.perform(
                 MockMvcRequestBuilders
                         .get("/api/v1/users")
@@ -109,7 +109,7 @@ class UserControllerTest {
 
     @Test
     void shouldDeleteById() throws Exception {
-        doNothing().when(userRepository).deleteById(1);
+        doNothing().when(userService).deleteById(1);
         MockHttpServletResponse response = mockMvc.perform(
                 MockMvcRequestBuilders
                         .delete("/api/v1/users/1")

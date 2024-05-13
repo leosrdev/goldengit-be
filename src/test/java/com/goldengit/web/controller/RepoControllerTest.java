@@ -2,7 +2,7 @@ package com.goldengit.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.goldengit.restclient.service.GitService;
-import com.goldengit.web.config.AppConfig;
+import com.goldengit.web.config.WebConfig;
 import com.goldengit.web.dto.PullRequestResponse;
 import com.goldengit.web.dto.RepoResponse;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
-@SpringBootTest(classes = {AppConfig.class, RepoController.class, ObjectMapper.class})
+@SpringBootTest(classes = {WebConfig.class, RepoController.class, ObjectMapper.class})
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 public class RepoControllerTest {
