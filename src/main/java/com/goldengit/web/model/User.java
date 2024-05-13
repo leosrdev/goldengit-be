@@ -7,8 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Date;
-
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
@@ -20,17 +18,15 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(length = 100, nullable = false)
-    @Size(max = 100)
+    @Column(length = 50, nullable = false)
+    @Size(max = 50)
     private String name;
 
-    @Column(unique = true, length = 100, nullable = false)
-    @Size(max = 100)
+    @Column(unique = true, length = 50, nullable = false)
+    @Size(max = 50)
     private String email;
 
     @Column(nullable = false)
-    @Size(max = 50)
+    @Size(max = 128)
     private String password;
-
-    private Date deleted;
 }
