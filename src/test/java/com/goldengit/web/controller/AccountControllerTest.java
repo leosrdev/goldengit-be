@@ -3,11 +3,11 @@ package com.goldengit.web.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.goldengit.web.config.WebConfig;
 import com.goldengit.web.dto.UserRequest;
-import com.goldengit.web.dto.UserResponse;
+import com.goldengit.web.exception.AccountAlreadyExistsException;
 import com.goldengit.web.service.AccountService;
-import com.goldengit.web.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,43 +16,28 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
-
-@SpringBootTest(classes =
-        {
-                WebConfig.class,
-                UserService.class,
-                AccountService.class,
-                UserController.class,
-                ObjectMapper.class,
-        }
-)
+@SpringBootTest(classes = {WebConfig.class, AccountService.class, AccountController.class, ObjectMapper.class})
 @AutoConfigureMockMvc
-class UserControllerTest {
-
+public class AccountControllerTest {
     private MockMvc mockMvc;
-
     @Autowired
-    private UserController userController;
+    private AccountController accountController;
+
     @MockBean
-    private UserService userService;
+    private AccountService accountService;
+
     private UserRequest userRequest;
-    private UserResponse userResponse;
     @Autowired
     private ObjectMapper objectMapper;
 
     @BeforeEach
     void setup() {
-        mockMvc = MockMvcBuilders.standaloneSetup(userController)
+        mockMvc = MockMvcBuilders.standaloneSetup(accountController)
                 .build();
 
         userRequest = UserRequest.builder()
@@ -60,64 +45,63 @@ class UserControllerTest {
                 .email("john@server.net")
                 .password("secret")
                 .build();
-
-        userResponse = UserResponse.builder()
-                .name("John")
-                .email("john@server.net")
-                .id(1)
-                .build();
     }
 
     @Test
-    void shouldCreateUser() throws Exception {
-        when(userService.save(userRequest)).thenReturn(userResponse);
+    void shouldRegisterNewAccount() throws Exception {
+        Mockito.doNothing().when(accountService).register(userRequest);
         String requestAsJson = objectMapper.writeValueAsString(userRequest);
 
         MockHttpServletResponse response = mockMvc.perform(
-                post("/api/v1/users")
+                post("/api/v1/accounts")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestAsJson)
         ).andReturn().getResponse();
-
         assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.getContentAsString()).isEqualTo(objectMapper.writeValueAsString(userResponse));
     }
 
     @Test
-    void shouldFindById() throws Exception {
-        when(userService.findById(1)).thenReturn(userResponse);
+    void shouldReturnConflictWhenAccountAlreadyExists() throws Exception {
+        Mockito.doThrow(new AccountAlreadyExistsException("")).when(accountService).register(userRequest);
+        String requestAsJson = objectMapper.writeValueAsString(userRequest);
         MockHttpServletResponse response = mockMvc.perform(
-                MockMvcRequestBuilders
-                        .get("/api/v1/users/1")
+                post("/api/v1/accounts")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestAsJson)
         ).andReturn().getResponse();
-
-        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.getContentAsString()).isEqualTo(objectMapper.writeValueAsString(userResponse));
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.CONFLICT.value());
     }
 
     @Test
-    void shouldListUsers() throws Exception {
-        when(userService.findAll()).thenReturn(List.of(userResponse));
+    void shouldReturnBadRequestForInvalidEmail() throws Exception {
+        String requestAsJson = objectMapper.writeValueAsString(userRequest.toBuilder().email("invalid").build());
         MockHttpServletResponse response = mockMvc.perform(
-                MockMvcRequestBuilders
-                        .get("/api/v1/users")
+                post("/api/v1/accounts")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestAsJson)
         ).andReturn().getResponse();
-
-        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.getContentAsString()).isEqualTo(objectMapper.writeValueAsString(List.of(userResponse)));
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     @Test
-    void shouldDeleteById() throws Exception {
-        doNothing().when(userService).deleteById(1);
+    void shouldReturnBadRequestForInvalidName() throws Exception {
+        String requestAsJson = objectMapper.writeValueAsString(userRequest.toBuilder().name("").build());
         MockHttpServletResponse response = mockMvc.perform(
-                MockMvcRequestBuilders
-                        .delete("/api/v1/users/1")
+                post("/api/v1/accounts")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestAsJson)
         ).andReturn().getResponse();
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
 
-        assertThat(response.getStatus()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    @Test
+    void shouldReturnBadRequestForInvalidPassword() throws Exception {
+        String requestAsJson = objectMapper.writeValueAsString(userRequest.toBuilder().password("").build());
+        MockHttpServletResponse response = mockMvc.perform(
+                post("/api/v1/accounts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestAsJson)
+        ).andReturn().getResponse();
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 }
