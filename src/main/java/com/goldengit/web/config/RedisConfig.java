@@ -33,6 +33,7 @@ public class RedisConfig {
         return RedisCacheManager.builder(redisConnectionFactory())
                 .cacheDefaults(cacheConfig)
                 .withCacheConfiguration("git-repositories", redisDefaultCacheConfig(Duration.ofMinutes(5)))
+                .withCacheConfiguration("users", redisDefaultCacheConfig(Duration.ofHours(3)))
                 .build();
     }
 

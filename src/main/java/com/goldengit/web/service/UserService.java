@@ -5,6 +5,8 @@ import com.goldengit.web.dto.UserResponse;
 import com.goldengit.web.model.User;
 import com.goldengit.web.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,10 +21,11 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @CachePut(cacheNames = "users", key = "#userRequest.email")
     public UserResponse save(UserRequest userRequest) {
         User user = User.builder()
                 .name(userRequest.getName())
-                .email(userRequest.getEmail())
+                .email(userRequest.getEmail().toLowerCase())
                 .password(passwordEncoder.encode(userRequest.getPassword()))
                 .build();
 
@@ -58,7 +61,13 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email);
+    @Cacheable("users")
+    public Optional<UserResponse> findByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .flatMap(value ->
+                        Optional.of(UserResponse.builder()
+                                .id(value.getId())
+                                .name(value.getName())
+                                .email(value.getEmail()).build()));
     }
 }
