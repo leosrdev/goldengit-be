@@ -14,6 +14,7 @@ import java.time.Duration;
 
 @Configuration
 public class RedisConfig {
+    public static final String ACTIVATION_KEYS = "activation-keys";
     @Value("${redis.host}")
     private String redisHost;
 
@@ -34,6 +35,7 @@ public class RedisConfig {
                 .cacheDefaults(cacheConfig)
                 .withCacheConfiguration("git-repositories", redisDefaultCacheConfig(Duration.ofMinutes(5)))
                 .withCacheConfiguration("users", redisDefaultCacheConfig(Duration.ofHours(3)))
+                .withCacheConfiguration(ACTIVATION_KEYS, redisDefaultCacheConfig(Duration.ofHours(3)))
                 .build();
     }
 

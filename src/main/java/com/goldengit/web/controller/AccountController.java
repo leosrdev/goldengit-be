@@ -43,8 +43,7 @@ public class AccountController {
     public ResponseEntity<String> register(@Valid @RequestBody UserRequest userRequest, HttpServletRequest httpRequest)
             throws AccountAlreadyExistsException, DisposableEmailException {
         if (bucket.tryConsume(1)) {
-            UserRequest normalizedRequest = userRequest.toBuilder().email(userRequest.getEmail().toLowerCase()).build();
-            accountService.register(normalizedRequest);
+            accountService.register(userRequest);
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } else {
             log.warn(String.format("Too many requests, IP %s", httpRequest.getRemoteAddr()));

@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import java.util.Random;
 import java.util.UUID;
 
+import static com.goldengit.web.config.RedisConfig.ACTIVATION_KEYS;
+
 @Service
 @AllArgsConstructor
 public class AccountService {
@@ -19,20 +21,21 @@ public class AccountService {
     private final RedisTemplate<String, String> redisTemplate;
 
     public void register(UserRequest userRequest) throws AccountAlreadyExistsException, DisposableEmailException {
-        if (isDisposableEmail(userRequest.getEmail())) {
+        UserRequest request = userRequest.toBuilder().email(userRequest.getEmail().toLowerCase()).build();
+        if (isDisposableEmail(request.getEmail())) {
             throw new DisposableEmailException("Invalid domain");
         }
 
-        if (accountDoesNotExist(userRequest.getEmail())) {
-            userService.save(userRequest);
-            saveKeyForAccountActivation(userRequest);
+        if (accountDoesNotExist(request.getEmail())) {
+            userService.save(request);
+            createAccountActivationKey(request.getEmail());
         } else {
             throw new AccountAlreadyExistsException("Account already exists");
         }
     }
 
-    private void saveKeyForAccountActivation(UserRequest userRequest) {
-        redisTemplate.opsForValue().set(generateUUID(), userRequest.getEmail());
+    private void createAccountActivationKey(String email) {
+        redisTemplate.opsForValue().set(String.format("%s::%s", ACTIVATION_KEYS, generateUUID()), email);
     }
 
     private boolean accountDoesNotExist(String email) {
