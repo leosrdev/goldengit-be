@@ -1,5 +1,6 @@
 package com.goldengit.web.config;
 
+import com.zliio.disposable.Disposable;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
@@ -22,5 +23,10 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new ApiBandwidthHandler());
+    }
+
+    @Bean
+    public Disposable disposableEmailValidator() {
+        return new Disposable();
     }
 }

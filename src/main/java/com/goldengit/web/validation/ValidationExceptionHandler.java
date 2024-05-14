@@ -1,6 +1,8 @@
 package com.goldengit.web.validation;
 
 
+import com.goldengit.web.exception.AccountAlreadyExistsException;
+import com.goldengit.web.exception.DisposableEmailException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -22,6 +24,21 @@ public class ValidationExceptionHandler {
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
         });
+        return errors;
+    }
+
+    @ExceptionHandler(DisposableEmailException.class)
+    public Map<String, String> handleDisposableEmailException(DisposableEmailException exception) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("message", exception.getMessage());
+        return errors;
+    }
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(AccountAlreadyExistsException.class)
+    public Map<String, String> handleAccountAlreadyExistsException(AccountAlreadyExistsException exception) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("message", exception.getMessage());
         return errors;
     }
 }
