@@ -1,10 +1,12 @@
 package com.goldengit.web.service;
 
+import com.goldengit.web.dto.EmailMessage;
 import com.goldengit.web.dto.UserRequest;
 import com.goldengit.web.exception.AccountAlreadyExistsException;
 import com.goldengit.web.exception.DisposableEmailException;
 import com.zliio.disposable.Disposable;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -15,10 +17,12 @@ import static com.goldengit.web.config.RedisConfig.ACTIVATION_KEYS;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class AccountService {
     private final UserService userService;
     private final Disposable disposable;
     private final RedisTemplate<String, String> redisTemplate;
+    private final EmailProducerService emailProducerService;
 
     public void register(UserRequest userRequest) throws AccountAlreadyExistsException, DisposableEmailException {
         UserRequest request = userRequest.toBuilder().email(userRequest.getEmail().toLowerCase()).build();
@@ -28,14 +32,20 @@ public class AccountService {
 
         if (accountDoesNotExist(request.getEmail())) {
             userService.save(request);
-            createAccountActivationKey(request.getEmail());
+            sendEmailToActivateAccount(request.getEmail());
         } else {
             throw new AccountAlreadyExistsException("Account already exists");
         }
     }
 
-    private void createAccountActivationKey(String email) {
-        redisTemplate.opsForValue().set(String.format("%s::%s", ACTIVATION_KEYS, generateUUID()), email);
+    private void sendEmailToActivateAccount(String email) {
+        String uuid = generateUUID();
+        saveEmailActivationTokenIntoCache(email, uuid);
+        emailProducerService.publishEmailMessage(new EmailMessage(email, uuid));
+    }
+
+    private void saveEmailActivationTokenIntoCache(String email, String uuid) {
+        redisTemplate.opsForValue().set(String.format("%s::%s", ACTIVATION_KEYS, uuid), email);
     }
 
     private boolean accountDoesNotExist(String email) {

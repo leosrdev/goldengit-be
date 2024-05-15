@@ -8,16 +8,6 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
 
-  phpmyadmin:
-    image: phpmyadmin:5.2.1-apache
-    restart: always
-    ports:
-      - "3000:80"
-    environment:
-      PMA_HOST: mysql
-    depends_on:
-      - mysql
-
   redis-server:
     image: redis:7.2.4
     restart: always
@@ -26,7 +16,19 @@ services:
     volumes:
       - redis_data:/data
 
+  rabbitmq:
+    image: rabbitmq:3.13.2-management
+    container_name: 'rabbitmq'
+    ports:
+    - "5672:5672"
+    - "15672:15672"
+    volumes:
+      - rabbit_mq_lib_volume:/var/lib/rabbitmq
+      - rabbit_mq_log_volume:/var/log/rabbitmq
+
 volumes:
   mysql_data:
     driver: local
   redis_data:
+  rabbit_mq_lib_volume:
+  rabbit_mq_log_volume:
