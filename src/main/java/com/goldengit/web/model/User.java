@@ -6,12 +6,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicInsert;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
 @Data
 @Entity
+@DynamicInsert
 @Table(name = "users")
 public class User {
     @Id
@@ -29,4 +31,7 @@ public class User {
     @Column(nullable = false)
     @Size(max = 128)
     private String password;
+
+    @Column(nullable = false)
+    private Integer active;
 }

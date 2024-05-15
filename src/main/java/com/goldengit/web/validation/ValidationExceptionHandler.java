@@ -3,6 +3,7 @@ package com.goldengit.web.validation;
 
 import com.goldengit.web.exception.AccountAlreadyExistsException;
 import com.goldengit.web.exception.DisposableEmailException;
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -37,6 +38,14 @@ public class ValidationExceptionHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(AccountAlreadyExistsException.class)
     public Map<String, String> handleAccountAlreadyExistsException(AccountAlreadyExistsException exception) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("message", exception.getMessage());
+        return errors;
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(BadRequestException.class)
+    public Map<String, String> handleBadRequestException(BadRequestException exception) {
         Map<String, String> errors = new HashMap<>();
         errors.put("message", exception.getMessage());
         return errors;

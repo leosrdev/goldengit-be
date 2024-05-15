@@ -7,13 +7,13 @@ import com.goldengit.web.exception.DisposableEmailException;
 import com.zliio.disposable.Disposable;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.BadRequestException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Random;
 import java.util.UUID;
-
-import static com.goldengit.web.config.RedisConfig.ACTIVATION_KEYS;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @AllArgsConstructor
@@ -45,7 +45,7 @@ public class AccountService {
     }
 
     private void saveEmailActivationTokenIntoCache(String email, String uuid) {
-        redisTemplate.opsForValue().set(String.format("%s::%s", ACTIVATION_KEYS, uuid), email);
+        redisTemplate.opsForValue().set(uuid, email, 3, TimeUnit.HOURS);
     }
 
     private boolean accountDoesNotExist(String email) {
@@ -60,5 +60,15 @@ public class AccountService {
         Random random = new Random();
         UUID uuid = new UUID(random.nextLong(), random.nextLong());
         return uuid.toString();
+    }
+
+    public void activate(String token) throws BadRequestException {
+        String email = redisTemplate.opsForValue().get(token);
+        if (email != null) {
+            userService.activateAccount(email);
+            redisTemplate.delete(token);
+        } else {
+            throw new BadRequestException("Invalid token");
+        }
     }
 }

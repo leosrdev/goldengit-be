@@ -18,12 +18,12 @@ public class EmailConsumerService {
     @Autowired
     private EmailConfig emailConfig;
 
-    @Value("${goldengit.api.domain}")
-    private String domain;
+    @Value("${goldengit.account.activate.url}")
+    private String activateURL;
 
     @RabbitListener(queues = "${rabbitmq.email.queue}")
     public void processMessage(EmailMessage emailMessage) {
-        String link = String.format("https://%s/activate?t=%s", domain, emailMessage.getActivationToken());
+        String link = String.format("%s?t=%s", activateURL, emailMessage.getActivationToken());
         String formattedText = String.format(emailConfig.getEmailText(), emailMessage.getName(), link);
         emailSenderService.sendSimpleMessage(
                 emailConfig.getEmailFrom(),

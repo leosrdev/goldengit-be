@@ -7,16 +7,16 @@ import com.goldengit.web.service.AccountService;
 import io.github.bucket4j.Bucket;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
 
@@ -49,5 +49,11 @@ public class AccountController {
             log.warn(String.format("Too many requests, IP %s", httpRequest.getRemoteAddr()));
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).build();
         }
+    }
+
+    @GetMapping(path = "/activate", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> activate(@Valid @NonNull @RequestParam("t") String token) throws BadRequestException {
+        accountService.activate(token);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

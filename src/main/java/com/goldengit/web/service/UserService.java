@@ -37,6 +37,10 @@ public class UserService {
                 .build();
     }
 
+    public void activateAccount(String email) {
+        userRepository.activateAccount(email);
+    }
+
     public List<UserResponse> findAll() {
         var users = userRepository.findAll();
         List<UserResponse> userResponses = new ArrayList<>();
