@@ -1,0 +1,3 @@
+email-from: GoldenGit
+email-subject: GoldenGit | Activate your account [DO NOT REPLY]
+email-text: Hi %s!\n\nClick the following link to activate your account\n\n%s\nThis link is valid for 3 hours.\n\n\nBest regards,\nThe GoldenGit Team
