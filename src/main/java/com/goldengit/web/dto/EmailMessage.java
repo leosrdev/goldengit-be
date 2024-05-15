@@ -12,6 +12,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EmailMessage implements Serializable {
+    private String name;
     private String email;
     private String activationToken;
 }

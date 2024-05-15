@@ -32,16 +32,16 @@ public class AccountService {
 
         if (accountDoesNotExist(request.getEmail())) {
             userService.save(request);
-            sendEmailToActivateAccount(request.getEmail());
+            sendEmailToActivateAccount(request);
         } else {
             throw new AccountAlreadyExistsException("Account already exists");
         }
     }
 
-    private void sendEmailToActivateAccount(String email) {
+    private void sendEmailToActivateAccount(UserRequest request) {
         String uuid = generateUUID();
-        saveEmailActivationTokenIntoCache(email, uuid);
-        emailProducerService.publishEmailMessage(new EmailMessage(email, uuid));
+        saveEmailActivationTokenIntoCache(request.getEmail(), uuid);
+        emailProducerService.publishEmailMessage(new EmailMessage(request.getName(), request.getEmail(), uuid));
     }
 
     private void saveEmailActivationTokenIntoCache(String email, String uuid) {
