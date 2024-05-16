@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.goldengit.web.config.WebConfig;
 import com.goldengit.web.dto.UserRequest;
 import com.goldengit.web.dto.UserResponse;
-import com.goldengit.web.service.AccountService;
 import com.goldengit.web.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,15 +26,11 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 
-@SpringBootTest(classes =
-        {
-                WebConfig.class,
-                UserService.class,
-                AccountService.class,
-                UserController.class,
-                ObjectMapper.class,
-        }
-)
+@SpringBootTest(classes = {
+        WebConfig.class,
+        UserController.class,
+        ObjectMapper.class
+})
 @AutoConfigureMockMvc
 class UserControllerTest {
 

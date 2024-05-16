@@ -7,11 +7,10 @@ import com.goldengit.web.service.AccountService;
 import io.github.bucket4j.Bucket;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import lombok.NonNull;
+import jakarta.validation.constraints.Size;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -52,7 +51,7 @@ public class AccountController {
     }
 
     @GetMapping(path = "/activate", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> activate(@Valid @NonNull @RequestParam("t") String token) throws BadRequestException {
+    public ResponseEntity<String> activate(@RequestParam(value = "t") @Size(min = 1, max = 128) String token) throws BadRequestException {
         accountService.activate(token);
         return ResponseEntity.status(HttpStatus.OK).build();
     }

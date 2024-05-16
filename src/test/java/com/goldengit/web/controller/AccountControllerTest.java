@@ -21,6 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @SpringBootTest(classes = {
@@ -128,5 +129,15 @@ public class AccountControllerTest {
                         .content(requestAsJson)
         ).andReturn().getResponse();
         assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
+    void shouldActivateAccount() throws Exception {
+        Mockito.doNothing().when(accountService).activate("foobar");
+        MockHttpServletResponse response = mockMvc.perform(
+                get("/api/v1/accounts/activate?t=foobar")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andReturn().getResponse();
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
     }
 }
