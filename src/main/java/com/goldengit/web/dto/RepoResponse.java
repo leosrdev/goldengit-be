@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class RepoResponse {
+    private String uuid;
     private String name;
     private String fullName;
     private String description;

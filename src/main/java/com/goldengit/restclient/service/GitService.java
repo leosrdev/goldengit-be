@@ -6,6 +6,8 @@ import com.goldengit.restclient.schema.Repositories;
 import com.goldengit.restclient.schema.Repository;
 import com.goldengit.web.dto.PullRequestResponse;
 import com.goldengit.web.dto.RepoResponse;
+import com.goldengit.web.model.GitProject;
+import com.goldengit.web.service.GitProjectService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -22,6 +24,7 @@ import java.util.stream.Stream;
 public class GitService {
 
     private final GitHubAPI gitApi;
+    private final GitProjectService gitProjectService;
 
     @Cacheable("git-repositories")
     public List<RepoResponse> findRepoByQuery(String query) {
@@ -86,16 +89,20 @@ public class GitService {
                         return null;
                     }
                 }).toList();
-        return repos.stream().filter(Objects::nonNull).map(repository -> RepoResponse.builder()
-                .name(repository.name)
-                .fullName(repository.full_name)
-                .description(repository.description)
-                .avatarUrl(repository.owner.avatar_url)
-                .stars(repository.stargazers_count)
-                .forks(repository.forks_count)
-                .watchers(repository.watchers_count)
-                .defaultBranch(repository.default_branch)
-                .openIssues(repository.open_issues_count)
-                .build()).collect(Collectors.toList());
+        return repos.stream().filter(Objects::nonNull).map(repository -> {
+            GitProject gitProject = gitProjectService.findOrCreate(repository.full_name);
+            return RepoResponse.builder()
+                    .uuid(gitProject.getUuid())
+                    .name(repository.name)
+                    .fullName(repository.full_name)
+                    .description(repository.description)
+                    .avatarUrl(repository.owner.avatar_url)
+                    .stars(repository.stargazers_count)
+                    .forks(repository.forks_count)
+                    .watchers(repository.watchers_count)
+                    .defaultBranch(repository.default_branch)
+                    .openIssues(repository.open_issues_count)
+                    .build();
+        }).collect(Collectors.toList());
     }
 }
