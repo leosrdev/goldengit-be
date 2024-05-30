@@ -15,8 +15,8 @@
 log/
 target/
 
-# Credentials file
-dev_env.txt
+# ENV vars
+.env
 
 # MySQL scripts
 MySQL-scripts.sql

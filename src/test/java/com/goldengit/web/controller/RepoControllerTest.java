@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
@@ -72,6 +73,22 @@ public class RepoControllerTest {
         when(gitService.findRepoByQuery("spring")).thenReturn(List.of(repoResponse));
 
         MockHttpServletResponse response = mockMvc.perform(get(String.format("/api/v1/repos/search?q=%s", "spring"))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andReturn()
+                .getResponse();
+
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+
+        assertThat(response.getContentAsString())
+                .isEqualTo(objectMapper.writeValueAsString(Arrays.asList(repoResponse)));
+
+    }
+
+    @Test
+    void shouldListPopularRepos() throws Exception {
+        when(gitService.listPopularRepositories()).thenReturn(List.of(repoResponse));
+
+        MockHttpServletResponse response = mockMvc.perform(get("/api/v1/repos/popular")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andReturn()
                 .getResponse();

@@ -2,6 +2,7 @@ package com.goldengit.restclient.schema;
 
 public class Repository {
     public int id;
+    public Owner owner;
     public String name;
     public String full_name;
     public String description;

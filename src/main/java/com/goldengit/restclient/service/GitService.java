@@ -3,17 +3,22 @@ package com.goldengit.restclient.service;
 import com.goldengit.restclient.api.GitHubAPI;
 import com.goldengit.restclient.schema.PullRequest;
 import com.goldengit.restclient.schema.Repositories;
+import com.goldengit.restclient.schema.Repository;
 import com.goldengit.web.dto.PullRequestResponse;
 import com.goldengit.web.dto.RepoResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class GitService {
 
     private final GitHubAPI gitApi;
@@ -49,5 +54,48 @@ public class GitService {
                         .body(pullRequest.body)
                         .build()
         ).collect(Collectors.toList());
+    }
+
+    @Cacheable(value = "git-repositories", key = "'listPopularRepositories'")
+    public List<RepoResponse> listPopularRepositories() {
+        String[] popularRepositories = new String[]{
+                "twbs/bootstrap",
+                "microsoft/TypeScript",
+                "facebook/react",
+                "vercel/next.js",
+                "spring-projects/spring-boot",
+                "nodejs/node",
+                "expressjs/express",
+                "php/php-src",
+                "laravel/laravel",
+                "jenkinsci/jenkins",
+                "apache/spark",
+                "apache/kafka",
+                "grafana/grafana",
+                "apache/maven",
+                "mysql/mysql-server",
+                "mongodb/--mongo"
+        };
+
+        List<Repository> repos = Stream.of(popularRepositories).parallel()
+                .map(name -> {
+                    try {
+                        return gitApi.findRepoByFullName(name);
+                    } catch (Exception exception) {
+                        log.error("Error when fetching data, repository: " + name + ", error: " + exception.getMessage());
+                        return null;
+                    }
+                }).toList();
+        return repos.stream().filter(Objects::nonNull).map(repository -> RepoResponse.builder()
+                .name(repository.name)
+                .fullName(repository.full_name)
+                .description(repository.description)
+                .avatarUrl(repository.owner.avatar_url)
+                .stars(repository.stargazers_count)
+                .forks(repository.forks_count)
+                .watchers(repository.watchers_count)
+                .defaultBranch(repository.default_branch)
+                .openIssues(repository.open_issues_count)
+                .build()).collect(Collectors.toList());
     }
 }

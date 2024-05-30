@@ -2,6 +2,7 @@ package com.goldengit.restclient.api;
 
 import com.goldengit.restclient.schema.PullRequest;
 import com.goldengit.restclient.schema.Repositories;
+import com.goldengit.restclient.schema.Repository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -26,6 +27,17 @@ public class GitHubAPI extends BaseAPI {
                 .headers(httpHeaders -> httpHeaders.setBearerAuth(apiToken))
                 .retrieve()
                 .bodyToMono(Repositories.class)
+                .block();
+    }
+
+    public Repository findRepoByFullName(String fullName) {
+        return webClientBuilder.build()
+                .get()
+                .uri(String.format("https://api.github.com/repos/%s", fullName))
+                .accept(MediaType.APPLICATION_JSON)
+                .headers(httpHeaders -> httpHeaders.setBearerAuth(apiToken))
+                .retrieve()
+                .bodyToMono(Repository.class)
                 .block();
     }
 

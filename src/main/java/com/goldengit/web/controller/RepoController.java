@@ -5,6 +5,7 @@ import com.goldengit.web.dto.PullRequestResponse;
 import com.goldengit.web.dto.RepoResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,5 +30,10 @@ public class RepoController {
             return ResponseEntity.status(HttpStatus.OK).body(pullRequests);
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+
+    @GetMapping(value = "/popular", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<RepoResponse>> listPopularRepositories() {
+        return ResponseEntity.status(HttpStatus.OK).body(gitService.listPopularRepositories());
     }
 }
