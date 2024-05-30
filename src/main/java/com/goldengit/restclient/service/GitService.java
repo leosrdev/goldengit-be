@@ -74,7 +74,7 @@ public class GitService {
                 "grafana/grafana",
                 "apache/maven",
                 "mysql/mysql-server",
-                "mongodb/--mongo"
+                "mongodb/mongo"
         };
 
         List<Repository> repos = Stream.of(popularRepositories).parallel()
