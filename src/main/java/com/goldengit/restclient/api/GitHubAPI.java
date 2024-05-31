@@ -3,6 +3,7 @@ package com.goldengit.restclient.api;
 import com.goldengit.restclient.schema.PullRequest;
 import com.goldengit.restclient.schema.Repositories;
 import com.goldengit.restclient.schema.Repository;
+import com.goldengit.restclient.schema.WeekOfCommit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -57,5 +58,17 @@ public class GitHubAPI extends BaseAPI {
         }
 
         return Arrays.asList(pullRequests != null ? pullRequests : new PullRequest[0]);
+    }
+
+    public List<WeekOfCommit> getCommitActivity(String fullName) {
+        WeekOfCommit[] commits = webClientBuilder.build()
+                .get()
+                .uri(String.format("https://api.github.com/repos/%s/stats/commit_activity", fullName))
+                .accept(MediaType.APPLICATION_JSON)
+                .headers(httpHeaders -> httpHeaders.setBearerAuth(apiToken))
+                .retrieve()
+                .bodyToMono(WeekOfCommit[].class)
+                .block();
+        return commits != null ? Arrays.asList(commits) : List.of();
     }
 }

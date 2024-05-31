@@ -26,8 +26,7 @@ public class GitProjectService {
         ));
     }
 
-    @Cacheable("git-repositories")
-    public GitProject findById(String uuid) {
-        return repository.findById(uuid).orElseThrow();
+    public Optional<GitProject> findById(String uuid) {
+        return repository.findById(uuid);
     }
 }
