@@ -60,7 +60,7 @@ public class GitService {
     }
 
 
-    @Cacheable(value = "git-repositories", key = "'listPopularRepositories'")
+    @Cacheable(value = "git-repositories", key = "'popularRepositories'")
     public List<RepoResponse> listPopularRepositories() {
         String[] popularRepositories = new String[]{
                 "twbs/bootstrap",

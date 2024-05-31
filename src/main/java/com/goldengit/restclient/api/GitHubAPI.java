@@ -5,7 +5,6 @@ import com.goldengit.restclient.schema.Repositories;
 import com.goldengit.restclient.schema.Repository;
 import com.goldengit.restclient.schema.WeekOfCommit;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -24,7 +23,7 @@ public class GitHubAPI extends BaseAPI {
         return webClientBuilder.build()
                 .get()
                 .uri(String.format("https://api.github.com/search/repositories?q=%s", query))
-                .accept(MediaType.APPLICATION_JSON)
+                .accept(APPLICATION_JSON_GITHUB)
                 .headers(httpHeaders -> httpHeaders.setBearerAuth(apiToken))
                 .retrieve()
                 .bodyToMono(Repositories.class)
@@ -35,7 +34,7 @@ public class GitHubAPI extends BaseAPI {
         return webClientBuilder.build()
                 .get()
                 .uri(String.format("https://api.github.com/repos/%s", fullName))
-                .accept(MediaType.APPLICATION_JSON)
+                .accept(APPLICATION_JSON_GITHUB)
                 .headers(httpHeaders -> httpHeaders.setBearerAuth(apiToken))
                 .retrieve()
                 .bodyToMono(Repository.class)
@@ -48,7 +47,7 @@ public class GitHubAPI extends BaseAPI {
             pullRequests = webClientBuilder.build()
                     .get()
                     .uri(String.format("https://api.github.com/repos/%s/%s/pulls", owner, repo))
-                    .accept(MediaType.APPLICATION_JSON)
+                    .accept(APPLICATION_JSON_GITHUB)
                     .headers(httpHeaders -> httpHeaders.setBearerAuth(apiToken))
                     .retrieve()
                     .bodyToMono(PullRequest[].class)
@@ -66,7 +65,7 @@ public class GitHubAPI extends BaseAPI {
             pullRequests = webClientBuilder.build()
                     .get()
                     .uri(String.format("https://api.github.com/repos/%s/pulls?state=all&per_page=100&direction=desc", fullName))
-                    .accept(MediaType.APPLICATION_JSON)
+                    .accept(APPLICATION_JSON_GITHUB)
                     .headers(httpHeaders -> httpHeaders.setBearerAuth(apiToken))
                     .retrieve()
                     .bodyToMono(PullRequest[].class)
@@ -82,7 +81,7 @@ public class GitHubAPI extends BaseAPI {
         WeekOfCommit[] commits = webClientBuilder.build()
                 .get()
                 .uri(String.format("https://api.github.com/repos/%s/stats/commit_activity", fullName))
-                .accept(MediaType.APPLICATION_JSON)
+                .accept(APPLICATION_JSON_GITHUB)
                 .headers(httpHeaders -> httpHeaders.setBearerAuth(apiToken))
                 .retrieve()
                 .bodyToMono(WeekOfCommit[].class)

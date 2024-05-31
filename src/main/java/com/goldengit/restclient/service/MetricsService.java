@@ -10,6 +10,7 @@ import com.goldengit.web.service.GitProjectService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -29,6 +30,7 @@ public class MetricsService {
     private final GitHubAPI gitApi;
     private final GitProjectService gitProjectService;
 
+    @Cacheable(value = "git-repositories", key = "'commitActivityByWeek:' + #uuid")
     public List<WeekOfCommitResponse> getCommitActivityByWeek(String uuid) throws BadRequestException {
         Optional<GitProject> optionalProject = gitProjectService.findById(uuid);
         if (optionalProject.isEmpty()) {
@@ -45,9 +47,10 @@ public class MetricsService {
                 .map(weekOfCommit -> WeekOfCommitResponse.builder()
                         .week(weekOfCommit.getWeek())
                         .total(weekOfCommit.getTotal())
-                        .build()).toList();
+                        .build()).collect(Collectors.toList());
     }
 
+    @Cacheable(value = "git-repositories", key = "'accumulatedCommitsByWeek:' + #uuid")
     public List<WeekOfCommitResponse> getAccumulatedCommitsByWeek(String uuid) throws BadRequestException {
         Optional<GitProject> optionalProject = gitProjectService.findById(uuid);
         if (optionalProject.isEmpty()) {
@@ -66,9 +69,10 @@ public class MetricsService {
                 .map(weekOfCommit -> WeekOfCommitResponse.builder()
                         .week(weekOfCommit.getWeek())
                         .total(weekOfCommit.getTotal())
-                        .build()).toList();
+                        .build()).collect(Collectors.toList());
     }
 
+    @Cacheable(value = "git-repositories", key = "'groupedPullRequestByRepo:' + #uuid")
     public List<PullRequestSummary> getGroupedPullRequestByRepo(String uuid) throws BadRequestException {
         Optional<GitProject> optionalProject = gitProjectService.findById(uuid);
         return optionalProject.map(gitProject -> {
