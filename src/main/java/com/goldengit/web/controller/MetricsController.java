@@ -1,5 +1,6 @@
 package com.goldengit.web.controller;
 
+import com.goldengit.restclient.schema.PullRequestSummary;
 import com.goldengit.restclient.service.MetricsService;
 import com.goldengit.web.dto.WeekOfCommitResponse;
 import lombok.AllArgsConstructor;
@@ -21,7 +22,7 @@ public class MetricsController {
 
     private final MetricsService metricsService;
 
-    @GetMapping(value = "/{uuid}/metrics/commit_activity", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{uuid}/metrics/commit-activity", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<WeekOfCommitResponse>> getCommitActivityByWeek(@PathVariable("uuid") String uuid) {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(metricsService.getCommitActivityByWeek(uuid));
@@ -30,10 +31,19 @@ public class MetricsController {
         }
     }
 
-    @GetMapping(value = "/{uuid}/metrics/accumulated_commits", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{uuid}/metrics/accumulated-commits", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<WeekOfCommitResponse>> getAccumulatedCommitsByWeek(@PathVariable("uuid") String uuid) {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(metricsService.getAccumulatedCommitsByWeek(uuid));
+        } catch (BadRequestException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping(value = "/{uuid}/metrics/pull-requests-summary", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<PullRequestSummary>> getPullRequestsByDate(@PathVariable("uuid") String uuid) {
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(metricsService.getGroupedPullRequestByRepo(uuid));
         } catch (BadRequestException e) {
             return ResponseEntity.badRequest().build();
         }

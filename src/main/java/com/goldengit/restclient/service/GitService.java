@@ -59,6 +59,7 @@ public class GitService {
         ).collect(Collectors.toList());
     }
 
+
     @Cacheable(value = "git-repositories", key = "'listPopularRepositories'")
     public List<RepoResponse> listPopularRepositories() {
         String[] popularRepositories = new String[]{
@@ -93,20 +94,24 @@ public class GitService {
                         return null;
                     }
                 }).toList();
-        return repos.stream().filter(Objects::nonNull).map(repository -> {
-            GitProject gitProject = gitProjectService.findOrCreate(repository.full_name);
-            return RepoResponse.builder()
-                    .uuid(gitProject.getUuid())
-                    .name(repository.name)
-                    .fullName(repository.full_name)
-                    .description(repository.description)
-                    .avatarUrl(repository.owner.avatar_url)
-                    .stars(repository.stargazers_count)
-                    .forks(repository.forks_count)
-                    .watchers(repository.watchers_count)
-                    .defaultBranch(repository.default_branch)
-                    .openIssues(repository.open_issues_count)
-                    .build();
-        }).collect(Collectors.toList());
+        return repos.stream()
+                .filter(Objects::nonNull)
+                .map(repository -> {
+                    GitProject gitProject = gitProjectService.findOrCreate(repository.full_name);
+                    return RepoResponse.builder()
+                            .uuid(gitProject.getUuid())
+                            .name(repository.name)
+                            .fullName(repository.full_name)
+                            .description(repository.description)
+                            .avatarUrl(repository.owner.avatar_url)
+                            .stars(repository.stargazers_count)
+                            .forks(repository.forks_count)
+                            .watchers(repository.watchers_count)
+                            .defaultBranch(repository.default_branch)
+                            .openIssues(repository.open_issues_count)
+                            .build();
+                })
+                .sorted((r1, r2) -> Integer.compare(r2.getStars(), r1.getStars()))
+                .collect(Collectors.toList());
     }
 }

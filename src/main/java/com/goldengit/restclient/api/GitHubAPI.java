@@ -60,6 +60,24 @@ public class GitHubAPI extends BaseAPI {
         return Arrays.asList(pullRequests != null ? pullRequests : new PullRequest[0]);
     }
 
+    public List<PullRequest> findAllPullRequestByRepoName(String fullName) {
+        PullRequest[] pullRequests = null;
+        try {
+            pullRequests = webClientBuilder.build()
+                    .get()
+                    .uri(String.format("https://api.github.com/repos/%s/pulls?state=all&per_page=100&direction=desc", fullName))
+                    .accept(MediaType.APPLICATION_JSON)
+                    .headers(httpHeaders -> httpHeaders.setBearerAuth(apiToken))
+                    .retrieve()
+                    .bodyToMono(PullRequest[].class)
+                    .block();
+        } catch (WebClientResponseException exception) {
+            return new ArrayList<>();
+        }
+
+        return Arrays.asList(pullRequests != null ? pullRequests : new PullRequest[0]);
+    }
+
     public List<WeekOfCommit> getCommitActivity(String fullName) {
         WeekOfCommit[] commits = webClientBuilder.build()
                 .get()
