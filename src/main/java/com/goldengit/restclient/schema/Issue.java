@@ -1,6 +1,6 @@
 package com.goldengit.restclient.schema;
 
-public class PullRequest {
+public class Issue {
     public long id;
     public int number;
     public String title;

@@ -1,7 +1,8 @@
 package com.goldengit.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.goldengit.restclient.schema.PullRequestSummaryResponse;
+import com.goldengit.web.dto.IssueSummaryResponse;
+import com.goldengit.web.dto.PullRequestSummaryResponse;
 import com.goldengit.restclient.service.MetricsService;
 import com.goldengit.web.config.WebConfig;
 import com.goldengit.web.dto.WeekOfCommitResponse;
@@ -150,6 +151,44 @@ public class MetricsControllerTest {
 
         MockHttpServletResponse response = mockMvc.perform(
                         get("/api/v1/repos/%s/metrics/pull-requests-summary".formatted(uuid))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andReturn()
+                .getResponse();
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
+    void shouldGetIssuesByDate() throws Exception {
+        String uuid = "sample";
+        IssueSummaryResponse issueSummaryResponse = IssueSummaryResponse.builder()
+                .date("20020-01-01")
+                .total(10L).
+                build();
+
+        when(metricsService.getIssuesSummary(uuid))
+                .thenReturn(List.of(issueSummaryResponse));
+
+        MockHttpServletResponse response = mockMvc.perform(
+                        get("/api/v1/repos/%s/metrics/issues-summary".formatted(uuid))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andReturn()
+                .getResponse();
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+
+        assertThat(response.getContentAsString())
+                .isEqualTo(objectMapper.writeValueAsString(List.of(issueSummaryResponse)));
+    }
+
+    @Test
+    void shouldThrowExceptionForGetIssuesByDate() throws Exception {
+        String uuid = "sample";
+        when(metricsService.getIssuesSummary(uuid))
+                .thenThrow(new BadRequestException());
+
+        MockHttpServletResponse response = mockMvc.perform(
+                        get("/api/v1/repos/%s/metrics/issues-summary".formatted(uuid))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andReturn()

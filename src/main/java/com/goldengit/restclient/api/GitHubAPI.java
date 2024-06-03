@@ -1,9 +1,6 @@
 package com.goldengit.restclient.api;
 
-import com.goldengit.restclient.schema.PullRequest;
-import com.goldengit.restclient.schema.Repositories;
-import com.goldengit.restclient.schema.Repository;
-import com.goldengit.restclient.schema.WeekOfCommit;
+import com.goldengit.restclient.schema.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -74,7 +71,24 @@ public class GitHubAPI extends BaseAPI {
             return new ArrayList<>();
         }
 
-        return Arrays.asList(pullRequests != null ? pullRequests : new PullRequest[0]);
+        return pullRequests != null ? Arrays.asList(pullRequests) : List.of();
+    }
+
+    public List<Issue> findAllIssuesByRepoName(String fullName) {
+        Issue[] issues = null;
+        try {
+            issues = webClientBuilder.build()
+                    .get()
+                    .uri(String.format("https://api.github.com/repos/%s/issues?state=all&per_page=100&direction=desc", fullName))
+                    .accept(APPLICATION_JSON_GITHUB)
+                    .headers(httpHeaders -> httpHeaders.setBearerAuth(apiToken))
+                    .retrieve()
+                    .bodyToMono(Issue[].class)
+                    .block();
+        } catch (WebClientResponseException exception) {
+            return List.of();
+        }
+        return issues != null ? Arrays.asList(issues) : List.of();
     }
 
     public List<WeekOfCommit> getCommitActivity(String fullName) {

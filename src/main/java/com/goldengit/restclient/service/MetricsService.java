@@ -1,8 +1,10 @@
 package com.goldengit.restclient.service;
 
 import com.goldengit.restclient.api.GitHubAPI;
+import com.goldengit.restclient.schema.Issue;
 import com.goldengit.restclient.schema.PullRequest;
-import com.goldengit.restclient.schema.PullRequestSummaryResponse;
+import com.goldengit.web.dto.IssueSummaryResponse;
+import com.goldengit.web.dto.PullRequestSummaryResponse;
 import com.goldengit.restclient.schema.WeekOfCommit;
 import com.goldengit.web.dto.WeekOfCommitResponse;
 import com.goldengit.web.model.GitProject;
@@ -72,7 +74,7 @@ public class MetricsService {
                         .build()).collect(Collectors.toList());
     }
 
-    @Cacheable(value = "git-repositories", key = "'groupedPullRequestByRepo:' + #uuid")
+    @Cacheable(value = "git-repositories", key = "'pullRequestsSummary:' + #uuid")
     public List<PullRequestSummaryResponse> getPullRequestsSummary(String uuid) throws BadRequestException {
         GitProject project = getProjectByUUID(uuid);
         List<PullRequest> pullRequests = gitApi.findAllPullRequestByRepoName(project.getFullName());
@@ -86,6 +88,27 @@ public class MetricsService {
 
         return pullRequestsGroupedByCreatedDate.entrySet().stream()
                 .map(entry -> PullRequestSummaryResponse.builder()
+                        .date(entry.getKey())
+                        .total(entry.getValue())
+                        .build())
+                .sorted(Comparator.comparing(p -> LocalDate.parse(p.getDate())))
+                .collect(Collectors.toList());
+    }
+
+    @Cacheable(value = "git-repositories", key = "'issuesSummary:' + #uuid")
+    public List<IssueSummaryResponse> getIssuesSummary(String uuid) throws BadRequestException {
+        GitProject project = getProjectByUUID(uuid);
+        List<Issue> issues = gitApi.findAllIssuesByRepoName(project.getFullName());
+        Map<String, Long> issuesGroupedByCreatedDate = issues
+                .stream()
+                .parallel()
+                .collect(Collectors.groupingByConcurrent(
+                        issue -> dateFormat(issue.created_at),
+                        Collectors.counting()
+                ));
+
+        return issuesGroupedByCreatedDate.entrySet().stream()
+                .map(entry -> IssueSummaryResponse.builder()
                         .date(entry.getKey())
                         .total(entry.getValue())
                         .build())

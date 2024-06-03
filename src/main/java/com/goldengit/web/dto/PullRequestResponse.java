@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class PullRequestResponse {
-    private int id;
+    private long id;
     private int number;
     private String createdAt;
     private String closedAt;
