@@ -1,6 +1,6 @@
 package com.goldengit.web.controller;
 
-import com.goldengit.restclient.schema.PullRequestSummary;
+import com.goldengit.restclient.schema.PullRequestSummaryResponse;
 import com.goldengit.restclient.service.MetricsService;
 import com.goldengit.web.dto.WeekOfCommitResponse;
 import lombok.AllArgsConstructor;
@@ -41,9 +41,9 @@ public class MetricsController {
     }
 
     @GetMapping(value = "/{uuid}/metrics/pull-requests-summary", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<PullRequestSummary>> getPullRequestsByDate(@PathVariable("uuid") String uuid) {
+    public ResponseEntity<List<PullRequestSummaryResponse>> getPullRequestsByDate(@PathVariable("uuid") String uuid) {
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(metricsService.getGroupedPullRequestByRepo(uuid));
+            return ResponseEntity.status(HttpStatus.OK).body(metricsService.getPullRequestsSummary(uuid));
         } catch (BadRequestException e) {
             return ResponseEntity.badRequest().build();
         }

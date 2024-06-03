@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PullRequestSummary {
+public class PullRequestSummaryResponse {
     private String date;
     private Long total;
 }

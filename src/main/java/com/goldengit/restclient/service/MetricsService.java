@@ -2,7 +2,7 @@ package com.goldengit.restclient.service;
 
 import com.goldengit.restclient.api.GitHubAPI;
 import com.goldengit.restclient.schema.PullRequest;
-import com.goldengit.restclient.schema.PullRequestSummary;
+import com.goldengit.restclient.schema.PullRequestSummaryResponse;
 import com.goldengit.restclient.schema.WeekOfCommit;
 import com.goldengit.web.dto.WeekOfCommitResponse;
 import com.goldengit.web.model.GitProject;
@@ -73,7 +73,7 @@ public class MetricsService {
     }
 
     @Cacheable(value = "git-repositories", key = "'groupedPullRequestByRepo:' + #uuid")
-    public List<PullRequestSummary> getGroupedPullRequestByRepo(String uuid) throws BadRequestException {
+    public List<PullRequestSummaryResponse> getPullRequestsSummary(String uuid) throws BadRequestException {
         Optional<GitProject> optionalProject = gitProjectService.findById(uuid);
         return optionalProject.map(gitProject -> {
                     List<PullRequest> pullRequests =
@@ -88,7 +88,7 @@ public class MetricsService {
                             ));
 
                     return pullRequestsGroupedByCreatedDate.entrySet().stream()
-                            .map(entry -> PullRequestSummary.builder()
+                            .map(entry -> PullRequestSummaryResponse.builder()
                                     .date(entry.getKey())
                                     .total(entry.getValue())
                                     .build())
