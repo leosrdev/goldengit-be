@@ -5,6 +5,7 @@ import com.goldengit.restclient.schema.PullRequestSummaryResponse;
 import com.goldengit.restclient.service.MetricsService;
 import com.goldengit.web.config.WebConfig;
 import com.goldengit.web.dto.WeekOfCommitResponse;
+import org.apache.coyote.BadRequestException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +70,21 @@ public class MetricsControllerTest {
     }
 
     @Test
+    void shouldThrowExceptionForGetCommitActivityByWeek() throws Exception {
+        String uuid = "sample";
+        when(metricsService.getCommitActivityByWeek(uuid))
+                .thenThrow(new BadRequestException());
+
+        MockHttpServletResponse response = mockMvc.perform(
+                        get("/api/v1/repos/%s/metrics/commit-activity".formatted(uuid))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andReturn()
+                .getResponse();
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
     void shouldGetAccumulatedCommitsByWeek() throws Exception {
         String uuid = "sample";
         WeekOfCommitResponse weekResponse = WeekOfCommitResponse.builder().week(1).total(1).build();
@@ -86,6 +102,21 @@ public class MetricsControllerTest {
 
         assertThat(response.getContentAsString())
                 .isEqualTo(objectMapper.writeValueAsString(List.of(weekResponse)));
+    }
+
+    @Test
+    void shouldThrowExceptionForGetAccumulatedCommitsByWeek() throws Exception {
+        String uuid = "sample";
+        when(metricsService.getAccumulatedCommitsByWeek(uuid))
+                .thenThrow(new BadRequestException());
+
+        MockHttpServletResponse response = mockMvc.perform(
+                        get("/api/v1/repos/%s/metrics/accumulated-commits".formatted(uuid))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andReturn()
+                .getResponse();
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     @Test
@@ -109,5 +140,20 @@ public class MetricsControllerTest {
 
         assertThat(response.getContentAsString())
                 .isEqualTo(objectMapper.writeValueAsString(List.of(pullRequestSummaryResponse)));
+    }
+
+    @Test
+    void shouldThrowExceptionForGetPullRequestsByDate() throws Exception {
+        String uuid = "sample";
+        when(metricsService.getPullRequestsSummary(uuid))
+                .thenThrow(new BadRequestException());
+
+        MockHttpServletResponse response = mockMvc.perform(
+                        get("/api/v1/repos/%s/metrics/pull-requests-summary".formatted(uuid))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andReturn()
+                .getResponse();
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 }

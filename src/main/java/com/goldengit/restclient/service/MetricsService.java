@@ -19,7 +19,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,14 +29,19 @@ public class MetricsService {
     private final GitHubAPI gitApi;
     private final GitProjectService gitProjectService;
 
+    @Cacheable(value = "git-repositories", key = "'projects:' + #uuid")
+    private GitProject getProjectByUUID(String uuid) throws BadRequestException {
+        return gitProjectService.findById(uuid)
+                .orElseThrow(() -> {
+                    log.error("No project found with uuid: " + uuid);
+                    return new BadRequestException("No project found with uuid: " + uuid);
+                });
+    }
+
     @Cacheable(value = "git-repositories", key = "'commitActivityByWeek:' + #uuid")
     public List<WeekOfCommitResponse> getCommitActivityByWeek(String uuid) throws BadRequestException {
-        Optional<GitProject> optionalProject = gitProjectService.findById(uuid);
-        if (optionalProject.isEmpty()) {
-            throw new BadRequestException();
-        }
-
-        List<WeekOfCommit> weekOfCommits = gitApi.getCommitActivity(optionalProject.get().getFullName());
+        GitProject project = getProjectByUUID(uuid);
+        List<WeekOfCommit> weekOfCommits = gitApi.getCommitActivity(project.getFullName());
         int weekNumber = 1;
         for (WeekOfCommit week : weekOfCommits) {
             week.setWeek(weekNumber++);
@@ -52,12 +56,8 @@ public class MetricsService {
 
     @Cacheable(value = "git-repositories", key = "'accumulatedCommitsByWeek:' + #uuid")
     public List<WeekOfCommitResponse> getAccumulatedCommitsByWeek(String uuid) throws BadRequestException {
-        Optional<GitProject> optionalProject = gitProjectService.findById(uuid);
-        if (optionalProject.isEmpty()) {
-            throw new BadRequestException();
-        }
-
-        List<WeekOfCommit> weekOfCommits = gitApi.getCommitActivity(optionalProject.get().getFullName());
+        GitProject project = getProjectByUUID(uuid);
+        List<WeekOfCommit> weekOfCommits = gitApi.getCommitActivity(project.getFullName());
         int weekNumber = 1;
         int numberOfCommits = 0;
         for (WeekOfCommit week : weekOfCommits) {
@@ -74,32 +74,23 @@ public class MetricsService {
 
     @Cacheable(value = "git-repositories", key = "'groupedPullRequestByRepo:' + #uuid")
     public List<PullRequestSummaryResponse> getPullRequestsSummary(String uuid) throws BadRequestException {
-        Optional<GitProject> optionalProject = gitProjectService.findById(uuid);
-        return optionalProject.map(gitProject -> {
-                    List<PullRequest> pullRequests =
-                            gitApi.findAllPullRequestByRepoName(optionalProject.get().getFullName());
+        GitProject project = getProjectByUUID(uuid);
+        List<PullRequest> pullRequests = gitApi.findAllPullRequestByRepoName(project.getFullName());
+        Map<String, Long> pullRequestsGroupedByCreatedDate = pullRequests
+                .stream()
+                .parallel()
+                .collect(Collectors.groupingByConcurrent(
+                        pullRequest -> dateFormat(pullRequest.created_at),
+                        Collectors.counting()
+                ));
 
-                    Map<String, Long> pullRequestsGroupedByCreatedDate = pullRequests
-                            .stream()
-                            .parallel()
-                            .collect(Collectors.groupingByConcurrent(
-                                    pullRequest -> dateFormat(pullRequest.created_at),
-                                    Collectors.counting()
-                            ));
-
-                    return pullRequestsGroupedByCreatedDate.entrySet().stream()
-                            .map(entry -> PullRequestSummaryResponse.builder()
-                                    .date(entry.getKey())
-                                    .total(entry.getValue())
-                                    .build())
-                            .sorted(Comparator.comparing(p -> LocalDate.parse(p.getDate())))
-                            .collect(Collectors.toList());
-
-                })
-                .orElseThrow(() -> {
-                    log.error("No project found with uuid: " + uuid);
-                    return new BadRequestException("No project found with uuid: " + uuid);
-                });
+        return pullRequestsGroupedByCreatedDate.entrySet().stream()
+                .map(entry -> PullRequestSummaryResponse.builder()
+                        .date(entry.getKey())
+                        .total(entry.getValue())
+                        .build())
+                .sorted(Comparator.comparing(p -> LocalDate.parse(p.getDate())))
+                .collect(Collectors.toList());
     }
 
     private String dateFormat(String input) {
