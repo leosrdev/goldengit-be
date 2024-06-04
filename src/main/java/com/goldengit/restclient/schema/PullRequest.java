@@ -8,4 +8,5 @@ public class PullRequest {
     public String body;
     public String created_at;
     public String closed_at;
+    public GitUser user;
 }

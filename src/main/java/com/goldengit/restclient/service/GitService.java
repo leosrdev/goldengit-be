@@ -10,6 +10,7 @@ import com.goldengit.web.model.GitProject;
 import com.goldengit.web.service.GitProjectService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.BadRequestException;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +22,7 @@ import java.util.stream.Stream;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class GitService {
+public class GitService extends BaseService {
 
     private final GitHubAPI gitApi;
     private final GitProjectService gitProjectService;
@@ -43,9 +44,9 @@ public class GitService {
         ).collect(Collectors.toList());
     }
 
-    public List<PullRequestResponse> findPullRequestByRepoName(String owner, String repo) {
-        List<PullRequest> pullRequests = gitApi.findPullRequestByRepoName(owner, repo);
-
+    public List<PullRequestResponse> findPullRequestByRepoUuid(String uuid) throws BadRequestException {
+        GitProject project = getProjectByUUID(uuid);
+        List<PullRequest> pullRequests = gitApi.findAllPullRequestByRepoName(project.getFullName(), 30, "desc");
         return pullRequests.stream().map(pullRequest ->
                 PullRequestResponse.builder()
                         .id(pullRequest.id)
@@ -54,7 +55,10 @@ public class GitService {
                         .state(pullRequest.state)
                         .createdAt(pullRequest.created_at)
                         .closedAt(pullRequest.closed_at)
-                        .body(pullRequest.body)
+                        //.body(pullRequest.body)
+                        .userLogin(pullRequest.user.login)
+                        .userHtmlUrl(pullRequest.user.html_url)
+                        .userAvatarUrl(pullRequest.user.avatar_url)
                         .build()
         ).collect(Collectors.toList());
     }

@@ -1,8 +1,8 @@
 package com.goldengit.web.controller;
 
+import com.goldengit.restclient.service.MetricsService;
 import com.goldengit.web.dto.IssueSummaryResponse;
 import com.goldengit.web.dto.PullRequestSummaryResponse;
-import com.goldengit.restclient.service.MetricsService;
 import com.goldengit.web.dto.WeekOfCommitResponse;
 import lombok.AllArgsConstructor;
 import org.apache.coyote.BadRequestException;

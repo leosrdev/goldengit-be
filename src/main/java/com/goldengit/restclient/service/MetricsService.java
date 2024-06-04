@@ -3,12 +3,11 @@ package com.goldengit.restclient.service;
 import com.goldengit.restclient.api.GitHubAPI;
 import com.goldengit.restclient.schema.Issue;
 import com.goldengit.restclient.schema.PullRequest;
+import com.goldengit.restclient.schema.WeekOfCommit;
 import com.goldengit.web.dto.IssueSummaryResponse;
 import com.goldengit.web.dto.PullRequestSummaryResponse;
-import com.goldengit.restclient.schema.WeekOfCommit;
 import com.goldengit.web.dto.WeekOfCommitResponse;
 import com.goldengit.web.model.GitProject;
-import com.goldengit.web.service.GitProjectService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
@@ -26,33 +25,23 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class MetricsService {
+public class MetricsService extends BaseService {
 
     private final GitHubAPI gitApi;
-    private final GitProjectService gitProjectService;
-
-    @Cacheable(value = "git-repositories", key = "'projects:' + #uuid")
-    private GitProject getProjectByUUID(String uuid) throws BadRequestException {
-        return gitProjectService.findById(uuid)
-                .orElseThrow(() -> {
-                    log.error("No project found with uuid: " + uuid);
-                    return new BadRequestException("No project found with uuid: " + uuid);
-                });
-    }
 
     @Cacheable(value = "git-repositories", key = "'commitActivityByWeek:' + #uuid")
     public List<WeekOfCommitResponse> getCommitActivityByWeek(String uuid) throws BadRequestException {
         GitProject project = getProjectByUUID(uuid);
         List<WeekOfCommit> weekOfCommits = gitApi.getCommitActivity(project.getFullName());
         int weekNumber = 1;
-        for (WeekOfCommit week : weekOfCommits) {
-            week.setWeek(weekNumber++);
+        for (WeekOfCommit weekOfCommit : weekOfCommits) {
+            weekOfCommit.week = weekNumber++;
         }
 
         return weekOfCommits.stream().parallel()
                 .map(weekOfCommit -> WeekOfCommitResponse.builder()
-                        .week(weekOfCommit.getWeek())
-                        .total(weekOfCommit.getTotal())
+                        .week(weekOfCommit.week)
+                        .total(weekOfCommit.total)
                         .build()).collect(Collectors.toList());
     }
 
@@ -63,14 +52,14 @@ public class MetricsService {
         int weekNumber = 1;
         int numberOfCommits = 0;
         for (WeekOfCommit week : weekOfCommits) {
-            week.setWeek(weekNumber++);
-            week.setTotal(numberOfCommits += week.getTotal());
+            week.week = weekNumber++;
+            week.total = (numberOfCommits += week.total);
         }
 
         return weekOfCommits.stream().parallel()
                 .map(weekOfCommit -> WeekOfCommitResponse.builder()
-                        .week(weekOfCommit.getWeek())
-                        .total(weekOfCommit.getTotal())
+                        .week(weekOfCommit.week)
+                        .total(weekOfCommit.total)
                         .build()).collect(Collectors.toList());
     }
 

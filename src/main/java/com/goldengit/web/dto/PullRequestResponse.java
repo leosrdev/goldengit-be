@@ -17,4 +17,7 @@ public class PullRequestResponse {
     private String title;
     private String state;
     private String body;
+    private String userLogin;
+    private String userHtmlUrl;
+    private String userAvatarUrl;
 }

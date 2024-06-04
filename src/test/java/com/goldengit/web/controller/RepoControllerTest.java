@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
@@ -102,10 +101,9 @@ public class RepoControllerTest {
 
     @Test
     void shouldSearchRepositories() throws Exception {
-        when(gitService.findPullRequestByRepoName("spring", "spring-boot")).thenReturn(List.of(pullRequestResponse));
-
+        when(gitService.findPullRequestByRepoUuid("uuid")).thenReturn(List.of(pullRequestResponse));
         MockHttpServletResponse response = mockMvc.perform(
-                        get(String.format("/api/v1/repos/%s/%s/pulls", "spring", "spring-boot"))
+                        get("/api/v1/repos/%s/pulls".formatted("uuid"))
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andReturn()
                 .getResponse();

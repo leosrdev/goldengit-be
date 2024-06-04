@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -38,37 +37,23 @@ public class GitHubAPI extends BaseAPI {
                 .block();
     }
 
-    public List<PullRequest> findPullRequestByRepoName(String owner, String repo) {
-        PullRequest[] pullRequests = null;
-        try {
-            pullRequests = webClientBuilder.build()
-                    .get()
-                    .uri(String.format("https://api.github.com/repos/%s/%s/pulls", owner, repo))
-                    .accept(APPLICATION_JSON_GITHUB)
-                    .headers(httpHeaders -> httpHeaders.setBearerAuth(apiToken))
-                    .retrieve()
-                    .bodyToMono(PullRequest[].class)
-                    .block();
-        } catch (WebClientResponseException exception) {
-            return new ArrayList<>();
-        }
-
-        return Arrays.asList(pullRequests != null ? pullRequests : new PullRequest[0]);
+    public List<PullRequest> findAllPullRequestByRepoName(String fullName) {
+        return findAllPullRequestByRepoName(fullName, 100, "desc");
     }
 
-    public List<PullRequest> findAllPullRequestByRepoName(String fullName) {
+    public List<PullRequest> findAllPullRequestByRepoName(String fullName, int pageSize, String direction) {
         PullRequest[] pullRequests = null;
         try {
             pullRequests = webClientBuilder.build()
                     .get()
-                    .uri(String.format("https://api.github.com/repos/%s/pulls?state=all&per_page=100&direction=desc", fullName))
+                    .uri("https://api.github.com/repos/%s/pulls?state=all&per_page=%s&direction=%s".formatted(fullName, pageSize, direction))
                     .accept(APPLICATION_JSON_GITHUB)
                     .headers(httpHeaders -> httpHeaders.setBearerAuth(apiToken))
                     .retrieve()
                     .bodyToMono(PullRequest[].class)
                     .block();
         } catch (WebClientResponseException exception) {
-            return new ArrayList<>();
+            return List.of();
         }
 
         return pullRequests != null ? Arrays.asList(pullRequests) : List.of();

@@ -4,6 +4,7 @@ import com.goldengit.restclient.service.GitService;
 import com.goldengit.web.dto.PullRequestResponse;
 import com.goldengit.web.dto.RepoResponse;
 import lombok.AllArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,13 +24,14 @@ public class RepoController {
         return ResponseEntity.ok(gitService.findRepoByQuery(query));
     }
 
-    @GetMapping("/{owner}/{repo}/pulls")
-    public ResponseEntity<List<PullRequestResponse>> getPullRequests(@PathVariable("owner") String owner, @PathVariable("repo") String repo) {
-        List<PullRequestResponse> pullRequests = gitService.findPullRequestByRepoName(owner, repo);
-        if (pullRequests != null && !pullRequests.isEmpty()) {
+    @GetMapping("/{uuid}/pulls")
+    public ResponseEntity<List<PullRequestResponse>> getPullRequests(@PathVariable("uuid") String uuid) {
+        try {
+            List<PullRequestResponse> pullRequests = gitService.findPullRequestByRepoUuid(uuid);
             return ResponseEntity.status(HttpStatus.OK).body(pullRequests);
+        } catch (BadRequestException exception) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     @GetMapping(value = "/popular", produces = MediaType.APPLICATION_JSON_VALUE)
