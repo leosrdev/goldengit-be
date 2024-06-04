@@ -3,6 +3,7 @@ package com.goldengit.restclient.schema;
 public class PullRequest {
     public long id;
     public int number;
+    public String html_url;
     public String title;
     public String state;
     public String body;

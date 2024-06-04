@@ -46,11 +46,12 @@ public class GitService extends BaseService {
 
     public List<PullRequestResponse> findPullRequestByRepoUuid(String uuid) throws BadRequestException {
         GitProject project = getProjectByUUID(uuid);
-        List<PullRequest> pullRequests = gitApi.findAllPullRequestByRepoName(project.getFullName(), 30, "desc");
+        List<PullRequest> pullRequests = gitApi.findAllPullRequestByRepoName(project.getFullName(), 15, "desc");
         return pullRequests.stream().map(pullRequest ->
                 PullRequestResponse.builder()
                         .id(pullRequest.id)
                         .number(pullRequest.number)
+                        .htmlUrl(pullRequest.html_url)
                         .title(pullRequest.title)
                         .state(pullRequest.state)
                         .createdAt(pullRequest.created_at)

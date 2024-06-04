@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class PullRequestResponse {
     private long id;
     private int number;
+    private String htmlUrl;
     private String createdAt;
     private String closedAt;
     private String title;
