@@ -44,6 +44,7 @@ public class GitService extends BaseService {
         ).collect(Collectors.toList());
     }
 
+    @Cacheable(value = "git-repositories", key = "'pullRequests:' + #uuid")
     public List<PullRequestResponse> findPullRequestByRepoUuid(String uuid) throws BadRequestException {
         GitProject project = getProjectByUUID(uuid);
         List<PullRequest> pullRequests = gitApi.findAllPullRequestByRepoName(project.getFullName(), 15, "desc");
