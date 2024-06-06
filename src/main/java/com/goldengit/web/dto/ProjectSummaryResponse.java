@@ -6,10 +6,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class WeekOfCommitResponse {
-    private long week;
-    private long total;
+@Builder
+public class ProjectSummaryResponse {
+    private String fullName;
+    private String summary;
 }

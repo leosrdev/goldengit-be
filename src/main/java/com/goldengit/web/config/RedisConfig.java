@@ -35,6 +35,7 @@ public class RedisConfig {
                 .withCacheConfiguration("git-repositories", redisDefaultCacheConfig(Duration.ofHours(1)))
                 .withCacheConfiguration("git-metrics", redisDefaultCacheConfig(Duration.ofHours(1)))
                 .withCacheConfiguration("users", redisDefaultCacheConfig(Duration.ofHours(3)))
+                .withCacheConfiguration("ai-generation", redisDefaultCacheConfig(Duration.ofDays(3)))
                 .build();
     }
 

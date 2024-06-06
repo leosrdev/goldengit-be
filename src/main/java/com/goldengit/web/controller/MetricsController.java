@@ -2,6 +2,7 @@ package com.goldengit.web.controller;
 
 import com.goldengit.restclient.service.MetricsService;
 import com.goldengit.web.dto.IssueSummaryResponse;
+import com.goldengit.web.dto.ProjectSummaryResponse;
 import com.goldengit.web.dto.PullRequestSummaryResponse;
 import com.goldengit.web.dto.WeekOfCommitResponse;
 import lombok.AllArgsConstructor;
@@ -54,6 +55,15 @@ public class MetricsController {
     public ResponseEntity<List<IssueSummaryResponse>> getIssuesByDate(@PathVariable("uuid") String uuid) {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(metricsService.getIssuesSummary(uuid));
+        } catch (BadRequestException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping(value = "/{uuid}/metrics/project-summary", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ProjectSummaryResponse> getProjectSummary(@PathVariable("uuid") String uuid) {
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(metricsService.getProjectSummary(uuid));
         } catch (BadRequestException e) {
             return ResponseEntity.badRequest().build();
         }

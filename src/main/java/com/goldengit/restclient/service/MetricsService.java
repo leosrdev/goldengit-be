@@ -4,10 +4,9 @@ import com.goldengit.restclient.api.GitHubAPI;
 import com.goldengit.restclient.schema.Issue;
 import com.goldengit.restclient.schema.PullRequest;
 import com.goldengit.restclient.schema.WeekOfCommit;
-import com.goldengit.web.dto.IssueSummaryResponse;
-import com.goldengit.web.dto.PullRequestSummaryResponse;
-import com.goldengit.web.dto.WeekOfCommitResponse;
+import com.goldengit.web.dto.*;
 import com.goldengit.web.model.GitProject;
+import com.goldengit.web.service.OpenAiService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
@@ -28,6 +27,8 @@ import java.util.stream.Collectors;
 public class MetricsService extends BaseService {
 
     private final GitHubAPI gitApi;
+    private final GitService gitService;
+    private final OpenAiService openAiService;
 
     @Cacheable(value = "git-repositories", key = "'commitActivityByWeek:' + #uuid")
     public List<WeekOfCommitResponse> getCommitActivityByWeek(String uuid) throws BadRequestException {
@@ -103,6 +104,19 @@ public class MetricsService extends BaseService {
                         .build())
                 .sorted(Comparator.comparing(p -> LocalDate.parse(p.getDate())))
                 .collect(Collectors.toList());
+    }
+
+    @Cacheable(value = "ai-generation", key = "'projectSummary:' + #uuid")
+    public ProjectSummaryResponse getProjectSummary(String uuid) throws BadRequestException {
+        GitProject project = getProjectByUUID(uuid);
+        List<PullRequestResponse> pullRequests = gitService.findPullRequestByRepoUuid(uuid);
+        List<String> titles = pullRequests.stream().map(PullRequestResponse::getTitle).toList();
+        String summary = openAiService.generateProjectSummaryFromPullRequests(project.getFullName(), titles);
+
+        return ProjectSummaryResponse.builder()
+                .fullName(project.getFullName())
+                .summary(summary)
+                .build();
     }
 
     private String dateFormat(String input) {

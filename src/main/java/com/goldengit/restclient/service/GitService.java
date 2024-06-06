@@ -78,7 +78,7 @@ public class GitService extends BaseService {
                 "expressjs/express",
                 "angular/angular",
                 "php/php-src",
-                "laravel/laravel",
+                "ollama/ollama",
                 "django/django",
                 "pytorch/pytorch",
                 "tensorflow/tensorflow",
@@ -86,7 +86,7 @@ public class GitService extends BaseService {
                 "apache/spark",
                 "apache/kafka",
                 "grafana/grafana",
-                "apache/maven",
+                "open-webui/open-webui",
                 "mysql/mysql-server",
                 "mongodb/mongo"
         };
