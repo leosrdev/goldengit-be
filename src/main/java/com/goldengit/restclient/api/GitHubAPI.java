@@ -120,4 +120,20 @@ public class GitHubAPI extends BaseAPI {
         }
         return contributors != null ? Arrays.asList(contributors) : List.of();
     }
+    public List<Release> findAllReleasesByRepoName(String fullName, int pageSize) {
+        Release[] releases = null;
+        try {
+            releases = webClientBuilder.build()
+                    .get()
+                    .uri(String.format("https://api.github.com/repos/%s/releases?per_page=%s", fullName, pageSize))
+                    .accept(APPLICATION_JSON_GITHUB)
+                    .headers(httpHeaders -> httpHeaders.setBearerAuth(apiToken))
+                    .retrieve()
+                    .bodyToMono(Release[].class)
+                    .block();
+        } catch (WebClientResponseException exception) {
+            return List.of();
+        }
+        return releases != null ? Arrays.asList(releases) : List.of();
+    }
 }
