@@ -11,5 +11,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ProjectSummaryResponse {
     private String fullName;
-    private String summary;
+    private String description;
+    private String lastChanges;
 }

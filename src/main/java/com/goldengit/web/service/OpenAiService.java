@@ -30,4 +30,12 @@ public class OpenAiService {
         ChatResponse response = chatModel.call(new Prompt(new UserMessage(message.toString())));
         return response.getResult().getOutput().getContent();
     }
+
+    public String generateProjectDescription(String projectName) {
+        StringBuilder message = new StringBuilder();
+        message.append("Write a 80-words description about the %s project on GitHub, ".formatted(projectName));
+        message.append("do not use technical terms or abbreviations ");
+        ChatResponse response = chatModel.call(new Prompt(new UserMessage(message.toString())));
+        return response.getResult().getOutput().getContent();
+    }
 }

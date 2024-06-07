@@ -63,7 +63,7 @@ public class MetricsController {
     @GetMapping(value = "/{uuid}/metrics/project-summary", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ProjectSummaryResponse> getProjectSummary(@PathVariable("uuid") String uuid) {
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(metricsService.getProjectSummary(uuid));
+            return ResponseEntity.status(HttpStatus.OK).body(metricsService.generateProjectSummary(uuid));
         } catch (BadRequestException e) {
             return ResponseEntity.badRequest().build();
         }

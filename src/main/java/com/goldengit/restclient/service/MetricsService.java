@@ -107,15 +107,17 @@ public class MetricsService extends BaseService {
     }
 
     @Cacheable(value = "ai-generation", key = "'projectSummary:' + #uuid")
-    public ProjectSummaryResponse getProjectSummary(String uuid) throws BadRequestException {
+    public ProjectSummaryResponse generateProjectSummary(String uuid) throws BadRequestException {
         GitProject project = getProjectByUUID(uuid);
         List<PullRequestResponse> pullRequests = gitService.findPullRequestByRepoUuid(uuid);
         List<String> titles = pullRequests.stream().map(PullRequestResponse::getTitle).toList();
-        String summary = openAiService.generateProjectSummaryFromPullRequests(project.getFullName(), titles);
+        String lastChanges = openAiService.generateProjectSummaryFromPullRequests(project.getFullName(), titles);
+        String description = openAiService.generateProjectDescription(project.getFullName());
 
         return ProjectSummaryResponse.builder()
                 .fullName(project.getFullName())
-                .summary(summary)
+                .description(description)
+                .lastChanges(lastChanges)
                 .build();
     }
 
