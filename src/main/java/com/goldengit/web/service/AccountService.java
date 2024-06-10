@@ -3,7 +3,7 @@ package com.goldengit.web.service;
 import com.goldengit.web.dto.EmailMessage;
 import com.goldengit.web.dto.UserRequest;
 import com.goldengit.web.exception.AccountAlreadyExistsException;
-import com.goldengit.web.exception.DisposableEmailException;
+import com.goldengit.web.exception.InvalidEmailDomainException;
 import com.zliio.disposable.Disposable;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,10 +24,10 @@ public class AccountService {
     private final RedisTemplate<String, String> redisTemplate;
     private final EmailProducerService emailProducerService;
 
-    public void register(UserRequest userRequest) throws AccountAlreadyExistsException, DisposableEmailException {
+    public void register(UserRequest userRequest) throws AccountAlreadyExistsException, InvalidEmailDomainException {
         UserRequest request = userRequest.toBuilder().email(userRequest.getEmail().toLowerCase()).build();
         if (isDisposableEmail(request.getEmail())) {
-            throw new DisposableEmailException("Invalid domain");
+            throw new InvalidEmailDomainException("Invalid domain");
         }
 
         if (accountDoesNotExist(request.getEmail())) {

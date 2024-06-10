@@ -1,9 +1,9 @@
-package com.goldengit.restclient.service;
+package com.goldengit.web.service;
 
-import com.goldengit.restclient.api.GitHubAPI;
-import com.goldengit.restclient.schema.Contributor;
+import com.goldengit.api.client.GitHubAPI;
+import com.goldengit.api.schema.Contributor;
 import com.goldengit.web.dto.ContributorResponse;
-import com.goldengit.web.model.GitProject;
+import com.goldengit.web.model.Project;
 import lombok.AllArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.cache.annotation.Cacheable;
@@ -17,10 +17,11 @@ import java.util.stream.Collectors;
 public class EngagementService extends BaseService {
 
     private final GitHubAPI gitApi;
+    private final ProjectService projectService;
 
     @Cacheable(value = "git-repositories", key = "'contributors:' + #uuid")
     public List<ContributorResponse> findTopContributorsByRepo(String uuid) throws BadRequestException {
-        GitProject project = getProjectByUUID(uuid);
+        Project project = projectService.getProjectByUUID(uuid);
         List<Contributor> contributors = gitApi.findAllContributorsByRepoName(project.getFullName(), 10);
 
         return contributors.stream().parallel()

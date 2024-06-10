@@ -1,10 +1,9 @@
 package com.goldengit.web.controller;
 
-import com.goldengit.restclient.service.MetricsService;
 import com.goldengit.web.dto.IssueSummaryResponse;
-import com.goldengit.web.dto.ProjectSummaryResponse;
 import com.goldengit.web.dto.PullRequestSummaryResponse;
 import com.goldengit.web.dto.WeekOfCommitResponse;
+import com.goldengit.web.service.MetricsService;
 import lombok.AllArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
@@ -60,12 +59,5 @@ public class MetricsController {
         }
     }
 
-    @GetMapping(value = "/{uuid}/metrics/project-summary", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ProjectSummaryResponse> getProjectSummary(@PathVariable("uuid") String uuid) {
-        try {
-            return ResponseEntity.status(HttpStatus.OK).body(metricsService.generateProjectSummary(uuid));
-        } catch (BadRequestException e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
+
 }

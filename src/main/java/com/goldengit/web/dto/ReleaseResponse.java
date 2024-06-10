@@ -1,6 +1,5 @@
 package com.goldengit.web.dto;
 
-import com.goldengit.restclient.schema.GitUser;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

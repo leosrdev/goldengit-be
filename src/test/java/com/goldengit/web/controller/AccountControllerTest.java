@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.goldengit.web.config.WebConfig;
 import com.goldengit.web.dto.UserRequest;
 import com.goldengit.web.exception.AccountAlreadyExistsException;
-import com.goldengit.web.exception.DisposableEmailException;
+import com.goldengit.web.exception.InvalidEmailDomainException;
 import com.goldengit.web.service.AccountService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -86,7 +86,7 @@ public class AccountControllerTest {
     @Disabled
     @Test
     void shouldReturnBadRequestForDisposableEmail() throws Exception {
-        Mockito.doThrow(new DisposableEmailException("Invalid domain"))
+        Mockito.doThrow(new InvalidEmailDomainException("Invalid domain"))
                 .when(accountService)
                 .register(userRequest);
         String requestAsJson = objectMapper.writeValueAsString(userRequest);

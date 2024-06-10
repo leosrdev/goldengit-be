@@ -1,8 +1,10 @@
-package com.goldengit.restclient.api;
+package com.goldengit.api.client;
 
-import com.goldengit.restclient.schema.*;
+import com.goldengit.api.schema.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -12,10 +14,13 @@ import java.util.List;
 
 @Component
 @Slf4j
-public class GitHubAPI extends BaseAPI {
+public class GitHubAPI {
 
+    @Value("${github.api.token}")
+    protected String apiToken;
     @Autowired
     private WebClient.Builder webClientBuilder;
+    protected final static MediaType APPLICATION_JSON_GITHUB = MediaType.valueOf("application/vnd.github+json");
 
     public Repositories findRepoByQuery(String query) {
         try {
@@ -28,7 +33,7 @@ public class GitHubAPI extends BaseAPI {
                     .bodyToMono(Repositories.class)
                     .block();
         } catch (Exception exception) {
-            log.error(exception.getMessage());
+            log.error(exception.getMessage(), exception.getCause());
             return new Repositories();
         }
     }
@@ -120,6 +125,7 @@ public class GitHubAPI extends BaseAPI {
         }
         return contributors != null ? Arrays.asList(contributors) : List.of();
     }
+
     public List<Release> findAllReleasesByRepoName(String fullName, int pageSize) {
         Release[] releases = null;
         try {

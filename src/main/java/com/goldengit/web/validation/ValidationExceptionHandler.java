@@ -2,7 +2,7 @@ package com.goldengit.web.validation;
 
 
 import com.goldengit.web.exception.AccountAlreadyExistsException;
-import com.goldengit.web.exception.DisposableEmailException;
+import com.goldengit.web.exception.InvalidEmailDomainException;
 import jakarta.validation.ConstraintViolationException;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
@@ -29,8 +29,8 @@ public class ValidationExceptionHandler {
         return errors;
     }
 
-    @ExceptionHandler(DisposableEmailException.class)
-    public Map<String, String> handleDisposableEmailException(DisposableEmailException exception) {
+    @ExceptionHandler(InvalidEmailDomainException.class)
+    public Map<String, String> handleDisposableEmailException(InvalidEmailDomainException exception) {
         Map<String, String> errors = new HashMap<>();
         errors.put("message", exception.getMessage());
         return errors;

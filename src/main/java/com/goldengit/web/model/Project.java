@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Data
-public class GitProject {
+public class Project {
     @Id
     @Column(unique = true, length = 36, nullable = false)
     private String uuid;

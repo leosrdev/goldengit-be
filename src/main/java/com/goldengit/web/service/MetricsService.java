@@ -1,12 +1,13 @@
-package com.goldengit.restclient.service;
+package com.goldengit.web.service;
 
-import com.goldengit.restclient.api.GitHubAPI;
-import com.goldengit.restclient.schema.Issue;
-import com.goldengit.restclient.schema.PullRequest;
-import com.goldengit.restclient.schema.WeekOfCommit;
-import com.goldengit.web.dto.*;
-import com.goldengit.web.model.GitProject;
-import com.goldengit.web.service.OpenAiService;
+import com.goldengit.api.client.GitHubAPI;
+import com.goldengit.api.schema.Issue;
+import com.goldengit.api.schema.PullRequest;
+import com.goldengit.api.schema.WeekOfCommit;
+import com.goldengit.web.dto.IssueSummaryResponse;
+import com.goldengit.web.dto.PullRequestSummaryResponse;
+import com.goldengit.web.dto.WeekOfCommitResponse;
+import com.goldengit.web.model.Project;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
@@ -27,12 +28,11 @@ import java.util.stream.Collectors;
 public class MetricsService extends BaseService {
 
     private final GitHubAPI gitApi;
-    private final GitService gitService;
-    private final OpenAiService openAiService;
+    private final ProjectService projectService;
 
     @Cacheable(value = "git-repositories", key = "'commitActivityByWeek:' + #uuid")
     public List<WeekOfCommitResponse> getCommitActivityByWeek(String uuid) throws BadRequestException {
-        GitProject project = getProjectByUUID(uuid);
+        Project project = projectService.getProjectByUUID(uuid);
         List<WeekOfCommit> weekOfCommits = gitApi.getCommitActivity(project.getFullName());
         int weekNumber = 1;
         for (WeekOfCommit weekOfCommit : weekOfCommits) {
@@ -48,7 +48,7 @@ public class MetricsService extends BaseService {
 
     @Cacheable(value = "git-repositories", key = "'accumulatedCommitsByWeek:' + #uuid")
     public List<WeekOfCommitResponse> getAccumulatedCommitsByWeek(String uuid) throws BadRequestException {
-        GitProject project = getProjectByUUID(uuid);
+        Project project = projectService.getProjectByUUID(uuid);
         List<WeekOfCommit> weekOfCommits = gitApi.getCommitActivity(project.getFullName());
         int weekNumber = 1;
         int numberOfCommits = 0;
@@ -66,7 +66,7 @@ public class MetricsService extends BaseService {
 
     @Cacheable(value = "git-repositories", key = "'pullRequestsSummary:' + #uuid")
     public List<PullRequestSummaryResponse> getPullRequestsSummary(String uuid) throws BadRequestException {
-        GitProject project = getProjectByUUID(uuid);
+        Project project = projectService.getProjectByUUID(uuid);
         List<PullRequest> pullRequests = gitApi.findAllPullRequestByRepoName(project.getFullName());
         Map<String, Long> pullRequestsGroupedByCreatedDate = pullRequests
                 .stream()
@@ -87,7 +87,7 @@ public class MetricsService extends BaseService {
 
     @Cacheable(value = "git-repositories", key = "'issuesSummary:' + #uuid")
     public List<IssueSummaryResponse> getIssuesSummary(String uuid) throws BadRequestException {
-        GitProject project = getProjectByUUID(uuid);
+        Project project = projectService.getProjectByUUID(uuid);
         List<Issue> issues = gitApi.findAllIssuesByRepoName(project.getFullName());
         Map<String, Long> issuesGroupedByCreatedDate = issues
                 .stream()
@@ -106,20 +106,6 @@ public class MetricsService extends BaseService {
                 .collect(Collectors.toList());
     }
 
-    @Cacheable(value = "ai-generation", key = "'projectSummary:' + #uuid")
-    public ProjectSummaryResponse generateProjectSummary(String uuid) throws BadRequestException {
-        GitProject project = getProjectByUUID(uuid);
-        List<PullRequestResponse> pullRequests = gitService.findPullRequestByRepoUuid(uuid);
-        List<String> titles = pullRequests.stream().map(PullRequestResponse::getTitle).toList();
-        String lastChanges = openAiService.generateProjectSummaryFromPullRequests(project.getFullName(), titles);
-        String description = openAiService.generateProjectDescription(project.getFullName());
-
-        return ProjectSummaryResponse.builder()
-                .fullName(project.getFullName())
-                .description(description)
-                .lastChanges(lastChanges)
-                .build();
-    }
 
     private String dateFormat(String input) {
         ZonedDateTime zdt = ZonedDateTime.parse(input);

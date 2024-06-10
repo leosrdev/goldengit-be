@@ -1,13 +1,13 @@
-package com.goldengit.restclient.service;
+package com.goldengit.web.service;
 
-import com.goldengit.restclient.api.GitHubAPI;
-import com.goldengit.restclient.schema.PullRequest;
-import com.goldengit.restclient.schema.Repositories;
-import com.goldengit.restclient.schema.Repository;
+import com.goldengit.api.client.GitHubAPI;
+import com.goldengit.api.schema.PullRequest;
+import com.goldengit.api.schema.Repositories;
+import com.goldengit.api.schema.Repository;
 import com.goldengit.web.dto.PullRequestResponse;
 import com.goldengit.web.dto.RepoResponse;
-import com.goldengit.web.model.GitProject;
-import com.goldengit.web.service.GitProjectService;
+import com.goldengit.web.model.Project;
+import com.goldengit.web.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
@@ -16,16 +16,42 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class GitService extends BaseService {
+public class ProjectService extends BaseService {
 
     private final GitHubAPI gitApi;
-    private final GitProjectService gitProjectService;
+    private final ProjectRepository repository;
+
+    @Cacheable(value = "git-repositories", key = "'projects:' + #uuid")
+    protected Project getProjectByUUID(String uuid) throws BadRequestException {
+        return findById(uuid)
+                .orElseThrow(() -> {
+                    log.error("No project found with uuid: " + uuid);
+                    return new BadRequestException("No project found with uuid: " + uuid);
+                });
+    }
+
+    @Cacheable("git-repositories")
+    public Project findOrCreate(String fullName) {
+        Optional<Project> optionalGitProject = repository.findByFullName(fullName);
+        return optionalGitProject.orElseGet(() -> repository.save(
+                Project.builder()
+                        .uuid(UUID.randomUUID().toString())
+                        .fullName(fullName)
+                        .build()
+        ));
+    }
+
+    public Optional<Project> findById(String uuid) {
+        return repository.findById(uuid);
+    }
 
     @Cacheable("git-repositories")
     public List<RepoResponse> findRepoByQuery(String query) {
@@ -46,7 +72,7 @@ public class GitService extends BaseService {
 
     @Cacheable(value = "git-repositories", key = "'pullRequests:' + #uuid")
     public List<PullRequestResponse> findPullRequestByRepoUuid(String uuid) throws BadRequestException {
-        GitProject project = getProjectByUUID(uuid);
+        Project project = getProjectByUUID(uuid);
         List<PullRequest> pullRequests = gitApi.findAllPullRequestByRepoName(project.getFullName(), 15, "desc");
         return pullRequests.stream().map(pullRequest ->
                 PullRequestResponse.builder()
@@ -103,7 +129,7 @@ public class GitService extends BaseService {
         return repos.stream()
                 .filter(Objects::nonNull)
                 .map(repository -> {
-                    GitProject gitProject = gitProjectService.findOrCreate(repository.full_name);
+                    Project gitProject = findOrCreate(repository.full_name);
                     return RepoResponse.builder()
                             .uuid(gitProject.getUuid())
                             .name(repository.name)

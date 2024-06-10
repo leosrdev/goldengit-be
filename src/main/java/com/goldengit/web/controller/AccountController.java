@@ -2,7 +2,7 @@ package com.goldengit.web.controller;
 
 import com.goldengit.web.dto.UserRequest;
 import com.goldengit.web.exception.AccountAlreadyExistsException;
-import com.goldengit.web.exception.DisposableEmailException;
+import com.goldengit.web.exception.InvalidEmailDomainException;
 import com.goldengit.web.service.AccountService;
 import io.github.bucket4j.Bucket;
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,7 +40,7 @@ public class AccountController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<String> register(@Valid @RequestBody UserRequest userRequest, HttpServletRequest httpRequest)
-            throws AccountAlreadyExistsException, DisposableEmailException {
+            throws AccountAlreadyExistsException, InvalidEmailDomainException {
         if (bucket.tryConsume(1)) {
             accountService.register(userRequest);
             return ResponseEntity.status(HttpStatus.CREATED).build();

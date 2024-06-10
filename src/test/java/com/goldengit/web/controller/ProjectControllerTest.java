@@ -1,10 +1,10 @@
 package com.goldengit.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.goldengit.restclient.service.GitService;
 import com.goldengit.web.config.WebConfig;
 import com.goldengit.web.dto.PullRequestResponse;
 import com.goldengit.web.dto.RepoResponse;
+import com.goldengit.web.service.ProjectService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,17 +25,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
-@SpringBootTest(classes = {WebConfig.class, RepoController.class, ObjectMapper.class})
+@SpringBootTest(classes = {WebConfig.class, ProjectController.class, ObjectMapper.class})
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-public class RepoControllerTest {
+public class ProjectControllerTest {
 
     private MockMvc mockMvc;
     @MockBean
-    private GitService gitService;
+    private ProjectService projectService;
 
     @Autowired
-    private RepoController repoController;
+    private ProjectController projectController;
 
     private RepoResponse repoResponse;
 
@@ -45,7 +45,7 @@ public class RepoControllerTest {
 
     @BeforeEach
     void setup() {
-        mockMvc = MockMvcBuilders.standaloneSetup(repoController)
+        mockMvc = MockMvcBuilders.standaloneSetup(projectController)
                 .build();
 
         repoResponse = RepoResponse.builder()
@@ -69,7 +69,7 @@ public class RepoControllerTest {
 
     @Test
     void shouldListPullRequests() throws Exception {
-        when(gitService.findRepoByQuery("spring")).thenReturn(List.of(repoResponse));
+        when(projectService.findRepoByQuery("spring")).thenReturn(List.of(repoResponse));
 
         MockHttpServletResponse response = mockMvc.perform(get(String.format("/api/v1/repos/search?q=%s", "spring"))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -85,7 +85,7 @@ public class RepoControllerTest {
 
     @Test
     void shouldListPopularRepos() throws Exception {
-        when(gitService.listPopularRepositories()).thenReturn(List.of(repoResponse));
+        when(projectService.listPopularRepositories()).thenReturn(List.of(repoResponse));
 
         MockHttpServletResponse response = mockMvc.perform(get("/api/v1/repos/popular")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -101,7 +101,7 @@ public class RepoControllerTest {
 
     @Test
     void shouldSearchRepositories() throws Exception {
-        when(gitService.findPullRequestByRepoUuid("uuid")).thenReturn(List.of(pullRequestResponse));
+        when(projectService.findPullRequestByRepoUuid("uuid")).thenReturn(List.of(pullRequestResponse));
         MockHttpServletResponse response = mockMvc.perform(
                         get("/api/v1/repos/%s/pulls".formatted("uuid"))
                                 .contentType(MediaType.APPLICATION_JSON))

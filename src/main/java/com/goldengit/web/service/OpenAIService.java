@@ -13,7 +13,7 @@ import java.util.List;
 @Service
 @Slf4j
 @AllArgsConstructor
-public class OpenAiService {
+public class OpenAIService {
 
     private final OpenAiChatModel chatModel;
 
@@ -34,7 +34,7 @@ public class OpenAiService {
     public String generateProjectDescription(String projectName) {
         StringBuilder message = new StringBuilder();
         message.append("Write a 80-words description about the %s project on GitHub, ".formatted(projectName));
-        message.append("do not use technical terms or abbreviations ");
+        message.append("do not use technical terms or abbreviations");
         ChatResponse response = chatModel.call(new Prompt(new UserMessage(message.toString())));
         return response.getResult().getOutput().getContent();
     }

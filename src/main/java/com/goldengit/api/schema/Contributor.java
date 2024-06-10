@@ -1,4 +1,4 @@
-package com.goldengit.restclient.schema;
+package com.goldengit.api.schema;
 
 public class Contributor {
     public long id;

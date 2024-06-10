@@ -1,8 +1,8 @@
 package com.goldengit.web.controller;
 
-import com.goldengit.restclient.service.GitService;
 import com.goldengit.web.dto.PullRequestResponse;
 import com.goldengit.web.dto.RepoResponse;
+import com.goldengit.web.service.ProjectService;
 import lombok.AllArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
@@ -15,19 +15,19 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/repos")
 @AllArgsConstructor
-public class RepoController {
+public class ProjectController {
 
-    private final GitService gitService;
+    private final ProjectService projectService;
 
     @GetMapping("/search")
     public ResponseEntity<List<RepoResponse>> getRepoByQuery(@RequestParam("q") String query) {
-        return ResponseEntity.ok(gitService.findRepoByQuery(query));
+        return ResponseEntity.ok(projectService.findRepoByQuery(query));
     }
 
     @GetMapping("/{uuid}/pulls")
     public ResponseEntity<List<PullRequestResponse>> getPullRequests(@PathVariable("uuid") String uuid) {
         try {
-            List<PullRequestResponse> pullRequests = gitService.findPullRequestByRepoUuid(uuid);
+            List<PullRequestResponse> pullRequests = projectService.findPullRequestByRepoUuid(uuid);
             return ResponseEntity.status(HttpStatus.OK).body(pullRequests);
         } catch (BadRequestException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -36,6 +36,6 @@ public class RepoController {
 
     @GetMapping(value = "/popular", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<RepoResponse>> listPopularRepositories() {
-        return ResponseEntity.status(HttpStatus.OK).body(gitService.listPopularRepositories());
+        return ResponseEntity.status(HttpStatus.OK).body(projectService.listPopularRepositories());
     }
 }
