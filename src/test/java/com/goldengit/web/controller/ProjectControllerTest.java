@@ -1,10 +1,10 @@
 package com.goldengit.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.goldengit.web.config.WebConfig;
+import com.goldengit.infra.config.WebConfig;
 import com.goldengit.web.dto.PullRequestResponse;
 import com.goldengit.web.dto.RepoResponse;
-import com.goldengit.web.service.ProjectService;
+import com.goldengit.application.service.ProjectService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

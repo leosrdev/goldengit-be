@@ -1,11 +1,11 @@
 package com.goldengit.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.goldengit.web.config.WebConfig;
+import com.goldengit.infra.config.WebConfig;
 import com.goldengit.web.dto.UserRequest;
-import com.goldengit.web.exception.AccountAlreadyExistsException;
-import com.goldengit.web.exception.InvalidEmailDomainException;
-import com.goldengit.web.service.AccountService;
+import com.goldengit.domain.exception.AccountAlreadyExistsException;
+import com.goldengit.domain.exception.InvalidEmailDomainException;
+import com.goldengit.application.service.AccountService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;

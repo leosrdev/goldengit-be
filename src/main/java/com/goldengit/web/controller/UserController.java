@@ -1,8 +1,8 @@
 package com.goldengit.web.controller;
 
+import com.goldengit.application.service.UserService;
 import com.goldengit.web.dto.UserRequest;
 import com.goldengit.web.dto.UserResponse;
-import com.goldengit.web.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

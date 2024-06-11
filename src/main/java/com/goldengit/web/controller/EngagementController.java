@@ -1,7 +1,7 @@
 package com.goldengit.web.controller;
 
+import com.goldengit.application.service.EngagementService;
 import com.goldengit.web.dto.ContributorResponse;
-import com.goldengit.web.service.EngagementService;
 import lombok.AllArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;

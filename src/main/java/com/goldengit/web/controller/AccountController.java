@@ -1,9 +1,9 @@
 package com.goldengit.web.controller;
 
+import com.goldengit.application.service.AccountService;
+import com.goldengit.domain.exception.AccountAlreadyExistsException;
+import com.goldengit.domain.exception.InvalidEmailDomainException;
 import com.goldengit.web.dto.UserRequest;
-import com.goldengit.web.exception.AccountAlreadyExistsException;
-import com.goldengit.web.exception.InvalidEmailDomainException;
-import com.goldengit.web.service.AccountService;
 import io.github.bucket4j.Bucket;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
