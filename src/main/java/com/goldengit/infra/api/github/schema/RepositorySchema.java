@@ -1,8 +1,8 @@
 package com.goldengit.infra.api.github.schema;
 
-public class Repository {
+public class RepositorySchema {
     public int id;
-    public Owner owner;
+    public OwnerSchema owner;
     public String name;
     public String full_name;
     public String description;

@@ -1,4 +1,4 @@
-package com.goldengit.web.dto;
+package com.goldengit.web.model;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;

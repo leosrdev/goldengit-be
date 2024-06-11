@@ -1,6 +1,6 @@
 package com.goldengit.infra.api.github.schema;
 
-public class PullRequest {
+public class PullRequestSchema {
     public long id;
     public int number;
     public String html_url;
@@ -9,5 +9,5 @@ public class PullRequest {
     public String body;
     public String created_at;
     public String closed_at;
-    public GitUser user;
+    public UserSchema user;
 }

@@ -2,12 +2,12 @@ package com.goldengit.application.service;
 
 import com.goldengit.domain.model.Project;
 import com.goldengit.infra.api.github.client.GitHubClient;
-import com.goldengit.infra.api.github.schema.Issue;
-import com.goldengit.infra.api.github.schema.PullRequest;
-import com.goldengit.infra.api.github.schema.WeekOfCommit;
-import com.goldengit.web.dto.IssueSummaryResponse;
-import com.goldengit.web.dto.PullRequestSummaryResponse;
-import com.goldengit.web.dto.WeekOfCommitResponse;
+import com.goldengit.infra.api.github.schema.IssueSchema;
+import com.goldengit.infra.api.github.schema.PullRequestSchema;
+import com.goldengit.infra.api.github.schema.WeekOfCommitSchema;
+import com.goldengit.web.model.IssueSummaryResponse;
+import com.goldengit.web.model.PullRequestSummaryResponse;
+import com.goldengit.web.model.WeekOfCommitResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
@@ -33,46 +33,46 @@ public class MetricsService extends BaseService {
     @Cacheable(value = "git-repositories", key = "'commitActivityByWeek:' + #uuid")
     public List<WeekOfCommitResponse> getCommitActivityByWeek(String uuid) throws BadRequestException {
         Project project = projectService.getProjectByUUID(uuid);
-        List<WeekOfCommit> weekOfCommits = gitApi.getCommitActivity(project.getFullName());
+        List<WeekOfCommitSchema> weekOfCommitSchemas = gitApi.getCommitActivity(project.getFullName());
         int weekNumber = 1;
-        for (WeekOfCommit weekOfCommit : weekOfCommits) {
-            weekOfCommit.week = weekNumber++;
+        for (WeekOfCommitSchema weekOfCommitSchema : weekOfCommitSchemas) {
+            weekOfCommitSchema.week = weekNumber++;
         }
 
-        return weekOfCommits.stream().parallel()
-                .map(weekOfCommit -> WeekOfCommitResponse.builder()
-                        .week(weekOfCommit.week)
-                        .total(weekOfCommit.total)
+        return weekOfCommitSchemas.stream().parallel()
+                .map(weekOfCommitSchema -> WeekOfCommitResponse.builder()
+                        .week(weekOfCommitSchema.week)
+                        .total(weekOfCommitSchema.total)
                         .build()).collect(Collectors.toList());
     }
 
     @Cacheable(value = "git-repositories", key = "'accumulatedCommitsByWeek:' + #uuid")
     public List<WeekOfCommitResponse> getAccumulatedCommitsByWeek(String uuid) throws BadRequestException {
         Project project = projectService.getProjectByUUID(uuid);
-        List<WeekOfCommit> weekOfCommits = gitApi.getCommitActivity(project.getFullName());
+        List<WeekOfCommitSchema> weekOfCommitSchemas = gitApi.getCommitActivity(project.getFullName());
         int weekNumber = 1;
         int numberOfCommits = 0;
-        for (WeekOfCommit week : weekOfCommits) {
+        for (WeekOfCommitSchema week : weekOfCommitSchemas) {
             week.week = weekNumber++;
             week.total = (numberOfCommits += week.total);
         }
 
-        return weekOfCommits.stream().parallel()
-                .map(weekOfCommit -> WeekOfCommitResponse.builder()
-                        .week(weekOfCommit.week)
-                        .total(weekOfCommit.total)
+        return weekOfCommitSchemas.stream().parallel()
+                .map(weekOfCommitSchema -> WeekOfCommitResponse.builder()
+                        .week(weekOfCommitSchema.week)
+                        .total(weekOfCommitSchema.total)
                         .build()).collect(Collectors.toList());
     }
 
     @Cacheable(value = "git-repositories", key = "'pullRequestsSummary:' + #uuid")
     public List<PullRequestSummaryResponse> getPullRequestsSummary(String uuid) throws BadRequestException {
         Project project = projectService.getProjectByUUID(uuid);
-        List<PullRequest> pullRequests = gitApi.findAllPullRequestByRepoName(project.getFullName());
-        Map<String, Long> pullRequestsGroupedByCreatedDate = pullRequests
+        List<PullRequestSchema> pullRequestSchemas = gitApi.findAllPullRequestByRepoName(project.getFullName());
+        Map<String, Long> pullRequestsGroupedByCreatedDate = pullRequestSchemas
                 .stream()
                 .parallel()
                 .collect(Collectors.groupingByConcurrent(
-                        pullRequest -> dateFormat(pullRequest.created_at),
+                        pullRequestSchema -> dateFormat(pullRequestSchema.created_at),
                         Collectors.counting()
                 ));
 
@@ -88,12 +88,12 @@ public class MetricsService extends BaseService {
     @Cacheable(value = "git-repositories", key = "'issuesSummary:' + #uuid")
     public List<IssueSummaryResponse> getIssuesSummary(String uuid) throws BadRequestException {
         Project project = projectService.getProjectByUUID(uuid);
-        List<Issue> issues = gitApi.findAllIssuesByRepoName(project.getFullName());
-        Map<String, Long> issuesGroupedByCreatedDate = issues
+        List<IssueSchema> issueSchemas = gitApi.findAllIssuesByRepoName(project.getFullName());
+        Map<String, Long> issuesGroupedByCreatedDate = issueSchemas
                 .stream()
                 .parallel()
                 .collect(Collectors.groupingByConcurrent(
-                        issue -> dateFormat(issue.created_at),
+                        issueSchema -> dateFormat(issueSchema.created_at),
                         Collectors.counting()
                 ));
 

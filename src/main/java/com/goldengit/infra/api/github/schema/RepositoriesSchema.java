@@ -5,6 +5,6 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class Repositories {
-    private List<Repository> items;
+public class RepositoriesSchema {
+    private List<RepositorySchema> items;
 }

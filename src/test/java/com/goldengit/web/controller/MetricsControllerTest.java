@@ -2,9 +2,9 @@ package com.goldengit.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.goldengit.infra.config.WebConfig;
-import com.goldengit.web.dto.IssueSummaryResponse;
-import com.goldengit.web.dto.PullRequestSummaryResponse;
-import com.goldengit.web.dto.WeekOfCommitResponse;
+import com.goldengit.web.model.IssueSummaryResponse;
+import com.goldengit.web.model.PullRequestSummaryResponse;
+import com.goldengit.web.model.WeekOfCommitResponse;
 import com.goldengit.application.service.MetricsService;
 import org.apache.coyote.BadRequestException;
 import org.junit.jupiter.api.BeforeEach;

@@ -2,8 +2,8 @@ package com.goldengit.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.goldengit.infra.config.WebConfig;
-import com.goldengit.web.dto.PullRequestResponse;
-import com.goldengit.web.dto.RepoResponse;
+import com.goldengit.web.model.PullRequestResponse;
+import com.goldengit.web.model.RepoResponse;
 import com.goldengit.application.service.ProjectService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

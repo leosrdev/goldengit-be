@@ -22,7 +22,7 @@ public class GitHubClient {
     private WebClient.Builder webClientBuilder;
     protected final static MediaType APPLICATION_JSON_GITHUB = MediaType.valueOf("application/vnd.github+json");
 
-    public Repositories findRepoByQuery(String query) {
+    public RepositoriesSchema findRepoByQuery(String query) {
         try {
             return webClientBuilder.build()
                     .get()
@@ -30,15 +30,15 @@ public class GitHubClient {
                     .accept(APPLICATION_JSON_GITHUB)
                     .headers(httpHeaders -> httpHeaders.setBearerAuth(apiToken))
                     .retrieve()
-                    .bodyToMono(Repositories.class)
+                    .bodyToMono(RepositoriesSchema.class)
                     .block();
         } catch (Exception exception) {
             log.error(exception.getMessage(), exception.getCause());
-            return new Repositories();
+            return new RepositoriesSchema();
         }
     }
 
-    public Repository findRepoByFullName(String fullName) {
+    public RepositorySchema findRepoByFullName(String fullName) {
         try {
             return webClientBuilder.build()
                     .get()
@@ -46,61 +46,61 @@ public class GitHubClient {
                     .accept(APPLICATION_JSON_GITHUB)
                     .headers(httpHeaders -> httpHeaders.setBearerAuth(apiToken))
                     .retrieve()
-                    .bodyToMono(Repository.class)
+                    .bodyToMono(RepositorySchema.class)
                     .block();
         } catch (Exception exception) {
             log.error(exception.getMessage());
-            return new Repository();
+            return new RepositorySchema();
         }
     }
 
-    public List<PullRequest> findAllPullRequestByRepoName(String fullName) {
+    public List<PullRequestSchema> findAllPullRequestByRepoName(String fullName) {
         return findAllPullRequestByRepoName(fullName, 100, "desc");
     }
 
-    public List<PullRequest> findAllPullRequestByRepoName(String fullName, int pageSize, String direction) {
+    public List<PullRequestSchema> findAllPullRequestByRepoName(String fullName, int pageSize, String direction) {
         try {
-            PullRequest[] pullRequests = webClientBuilder.build()
+            PullRequestSchema[] pullRequestSchemas = webClientBuilder.build()
                     .get()
                     .uri("https://api.github.com/repos/%s/pulls?state=all&per_page=%s&direction=%s".formatted(fullName, pageSize, direction))
                     .accept(APPLICATION_JSON_GITHUB)
                     .headers(httpHeaders -> httpHeaders.setBearerAuth(apiToken))
                     .retrieve()
-                    .bodyToMono(PullRequest[].class)
+                    .bodyToMono(PullRequestSchema[].class)
                     .block();
-            return pullRequests != null ? Arrays.asList(pullRequests) : List.of();
+            return pullRequestSchemas != null ? Arrays.asList(pullRequestSchemas) : List.of();
         } catch (WebClientResponseException exception) {
             log.error(exception.getMessage());
             return List.of();
         }
     }
 
-    public List<Issue> findAllIssuesByRepoName(String fullName) {
+    public List<IssueSchema> findAllIssuesByRepoName(String fullName) {
         try {
-            Issue[] issues = webClientBuilder.build()
+            IssueSchema[] issueSchemas = webClientBuilder.build()
                     .get()
                     .uri(String.format("https://api.github.com/repos/%s/issues?state=all&per_page=100&direction=desc", fullName))
                     .accept(APPLICATION_JSON_GITHUB)
                     .headers(httpHeaders -> httpHeaders.setBearerAuth(apiToken))
                     .retrieve()
-                    .bodyToMono(Issue[].class)
+                    .bodyToMono(IssueSchema[].class)
                     .block();
-            return issues != null ? Arrays.asList(issues) : List.of();
+            return issueSchemas != null ? Arrays.asList(issueSchemas) : List.of();
         } catch (WebClientResponseException exception) {
             log.error(exception.getMessage());
             return List.of();
         }
     }
 
-    public List<WeekOfCommit> getCommitActivity(String fullName) {
+    public List<WeekOfCommitSchema> getCommitActivity(String fullName) {
         try {
-            WeekOfCommit[] commits = webClientBuilder.build()
+            WeekOfCommitSchema[] commits = webClientBuilder.build()
                     .get()
                     .uri(String.format("https://api.github.com/repos/%s/stats/commit_activity", fullName))
                     .accept(APPLICATION_JSON_GITHUB)
                     .headers(httpHeaders -> httpHeaders.setBearerAuth(apiToken))
                     .retrieve()
-                    .bodyToMono(WeekOfCommit[].class)
+                    .bodyToMono(WeekOfCommitSchema[].class)
                     .block();
             return commits != null ? Arrays.asList(commits) : List.of();
         } catch (Exception exception) {
@@ -109,37 +109,37 @@ public class GitHubClient {
         }
     }
 
-    public List<Contributor> findAllContributorsByRepoName(String fullName, int pageSize) {
-        Contributor[] contributors = null;
+    public List<ContributorSchema> findAllContributorsByRepoName(String fullName, int pageSize) {
+        ContributorSchema[] contributorSchemas = null;
         try {
-            contributors = webClientBuilder.build()
+            contributorSchemas = webClientBuilder.build()
                     .get()
                     .uri(String.format("https://api.github.com/repos/%s/contributors?per_page=%s", fullName, pageSize))
                     .accept(APPLICATION_JSON_GITHUB)
                     .headers(httpHeaders -> httpHeaders.setBearerAuth(apiToken))
                     .retrieve()
-                    .bodyToMono(Contributor[].class)
+                    .bodyToMono(ContributorSchema[].class)
                     .block();
         } catch (WebClientResponseException exception) {
             return List.of();
         }
-        return contributors != null ? Arrays.asList(contributors) : List.of();
+        return contributorSchemas != null ? Arrays.asList(contributorSchemas) : List.of();
     }
 
-    public List<Release> findAllReleasesByRepoName(String fullName, int pageSize) {
-        Release[] releases = null;
+    public List<ReleaseSchema> findAllReleasesByRepoName(String fullName, int pageSize) {
+        ReleaseSchema[] releaseSchemas = null;
         try {
-            releases = webClientBuilder.build()
+            releaseSchemas = webClientBuilder.build()
                     .get()
                     .uri(String.format("https://api.github.com/repos/%s/releases?per_page=%s", fullName, pageSize))
                     .accept(APPLICATION_JSON_GITHUB)
                     .headers(httpHeaders -> httpHeaders.setBearerAuth(apiToken))
                     .retrieve()
-                    .bodyToMono(Release[].class)
+                    .bodyToMono(ReleaseSchema[].class)
                     .block();
         } catch (WebClientResponseException exception) {
             return List.of();
         }
-        return releases != null ? Arrays.asList(releases) : List.of();
+        return releaseSchemas != null ? Arrays.asList(releaseSchemas) : List.of();
     }
 }

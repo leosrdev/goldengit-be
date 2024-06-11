@@ -2,8 +2,8 @@ package com.goldengit.application.service;
 
 import com.goldengit.domain.exception.AccountAlreadyExistsException;
 import com.goldengit.domain.exception.InvalidEmailDomainException;
-import com.goldengit.web.dto.EmailMessage;
-import com.goldengit.web.dto.UserRequest;
+import com.goldengit.web.model.EmailMessage;
+import com.goldengit.web.model.UserRequest;
 import com.zliio.disposable.Disposable;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

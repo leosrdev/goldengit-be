@@ -2,8 +2,8 @@ package com.goldengit.application.service;
 
 import com.goldengit.domain.model.User;
 import com.goldengit.infra.db.UserRepository;
-import com.goldengit.web.dto.UserRequest;
-import com.goldengit.web.dto.UserResponse;
+import com.goldengit.web.model.UserRequest;
+import com.goldengit.web.model.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;

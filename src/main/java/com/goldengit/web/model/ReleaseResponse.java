@@ -1,4 +1,4 @@
-package com.goldengit.web.dto;
+package com.goldengit.web.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,19 +6,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class PullRequestResponse {
-    private long id;
-    private int number;
+public class ReleaseResponse {
+    private String name;
+    private String tagName;
     private String htmlUrl;
-    private String createdAt;
-    private String closedAt;
-    private String title;
-    private String state;
-    private String body;
     private String userLogin;
     private String userHtmlUrl;
     private String userAvatarUrl;
+    private String publishedAt;
+    private String targetBranch;
+    private String draft;
 }

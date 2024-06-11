@@ -1,4 +1,4 @@
-package com.goldengit.web.dto;
+package com.goldengit.web.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

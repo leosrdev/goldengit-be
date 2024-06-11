@@ -3,7 +3,7 @@ package com.goldengit.web.controller;
 import com.goldengit.application.service.AccountService;
 import com.goldengit.domain.exception.AccountAlreadyExistsException;
 import com.goldengit.domain.exception.InvalidEmailDomainException;
-import com.goldengit.web.dto.UserRequest;
+import com.goldengit.web.model.UserRequest;
 import io.github.bucket4j.Bucket;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;

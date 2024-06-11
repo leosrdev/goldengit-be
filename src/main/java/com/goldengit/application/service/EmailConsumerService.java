@@ -1,7 +1,7 @@
 package com.goldengit.application.service;
 
 import com.goldengit.infra.config.EmailConfig;
-import com.goldengit.web.dto.EmailMessage;
+import com.goldengit.web.model.EmailMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;

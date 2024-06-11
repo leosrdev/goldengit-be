@@ -1,6 +1,6 @@
 package com.goldengit.infra.api.github.schema;
 
-public class Issue {
+public class IssueSchema {
     public long id;
     public int number;
     public String title;

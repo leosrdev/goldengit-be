@@ -2,11 +2,11 @@ package com.goldengit.application.service;
 
 import com.goldengit.domain.model.Project;
 import com.goldengit.infra.api.github.client.GitHubClient;
-import com.goldengit.infra.api.github.schema.Release;
+import com.goldengit.infra.api.github.schema.ReleaseSchema;
 import com.goldengit.infra.api.openai.client.OpenAIClient;
-import com.goldengit.web.dto.ProjectSummaryResponse;
-import com.goldengit.web.dto.PullRequestResponse;
-import com.goldengit.web.dto.ReleaseResponse;
+import com.goldengit.web.model.ProjectSummaryResponse;
+import com.goldengit.web.model.PullRequestResponse;
+import com.goldengit.web.model.ReleaseResponse;
 import lombok.AllArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.cache.annotation.Cacheable;
@@ -40,19 +40,19 @@ public class ProjectOverviewService extends BaseService {
     @Cacheable(value = "git-repositories", key = "'releases:' + #uuid")
     public List<ReleaseResponse> findAllReleasesByRepo(String uuid) throws BadRequestException {
         Project project = projectService.getProjectByUUID(uuid);
-        List<Release> releases = gitApi.findAllReleasesByRepoName(project.getFullName(), 10);
+        List<ReleaseSchema> releaseSchemas = gitApi.findAllReleasesByRepoName(project.getFullName(), 10);
 
-        return releases.stream().parallel()
-                .map(release -> ReleaseResponse.builder()
-                        .name(release.name)
-                        .tagName(release.tag_name)
-                        .htmlUrl(release.html_url)
-                        .userLogin(release.author.login)
-                        .userHtmlUrl(release.author.html_url)
-                        .userAvatarUrl(release.author.avatar_url)
-                        .publishedAt(release.published_at)
-                        .targetBranch(release.target_commitish)
-                        .draft(release.draft)
+        return releaseSchemas.stream().parallel()
+                .map(releaseSchema -> ReleaseResponse.builder()
+                        .name(releaseSchema.name)
+                        .tagName(releaseSchema.tag_name)
+                        .htmlUrl(releaseSchema.html_url)
+                        .userLogin(releaseSchema.author.login)
+                        .userHtmlUrl(releaseSchema.author.html_url)
+                        .userAvatarUrl(releaseSchema.author.avatar_url)
+                        .publishedAt(releaseSchema.published_at)
+                        .targetBranch(releaseSchema.target_commitish)
+                        .draft(releaseSchema.draft)
                         .build()
                 )
                 .collect(Collectors.toList());

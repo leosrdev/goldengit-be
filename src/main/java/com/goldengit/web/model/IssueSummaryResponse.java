@@ -1,4 +1,4 @@
-package com.goldengit.web.dto;
+package com.goldengit.web.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PullRequestSummaryResponse {
+public class IssueSummaryResponse {
     private String date;
     private Long total;
 }

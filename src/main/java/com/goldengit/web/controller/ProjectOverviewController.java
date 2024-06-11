@@ -1,8 +1,8 @@
 package com.goldengit.web.controller;
 
 import com.goldengit.application.service.ProjectOverviewService;
-import com.goldengit.web.dto.ProjectSummaryResponse;
-import com.goldengit.web.dto.ReleaseResponse;
+import com.goldengit.web.model.ProjectSummaryResponse;
+import com.goldengit.web.model.ReleaseResponse;
 import lombok.AllArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
