@@ -1,7 +1,13 @@
 package com.goldengit.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.goldengit.application.dto.IssueSummaryDTO;
+import com.goldengit.application.dto.PullRequestSummaryDTO;
+import com.goldengit.application.dto.WeekOfCommitDTO;
 import com.goldengit.infra.config.WebConfig;
+import com.goldengit.web.mapper.IssueSummaryResponseMapper;
+import com.goldengit.web.mapper.PullRequestSummaryResponseMapper;
+import com.goldengit.web.mapper.WeekOfCommitResponseMapper;
 import com.goldengit.web.model.IssueSummaryResponse;
 import com.goldengit.web.model.PullRequestSummaryResponse;
 import com.goldengit.web.model.WeekOfCommitResponse;
@@ -28,6 +34,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @SpringBootTest(classes = {
         WebConfig.class,
         MetricsService.class,
+        WeekOfCommitResponseMapper.class,
+        PullRequestSummaryResponseMapper.class,
+        IssueSummaryResponseMapper.class,
         MetricsController.class,
         ObjectMapper.class
 })
@@ -53,7 +62,7 @@ public class MetricsControllerTest {
     @Test
     void shouldGetCommitActivityByWeek() throws Exception {
         String uuid = "sample";
-        WeekOfCommitResponse weekResponse = WeekOfCommitResponse.builder().week(1).total(1).build();
+        WeekOfCommitDTO weekResponse = WeekOfCommitDTO.builder().week(1).total(1).build();
 
         when(metricsService.getCommitActivityByWeek(uuid))
                 .thenReturn(List.of(weekResponse));
@@ -88,7 +97,7 @@ public class MetricsControllerTest {
     @Test
     void shouldGetAccumulatedCommitsByWeek() throws Exception {
         String uuid = "sample";
-        WeekOfCommitResponse weekResponse = WeekOfCommitResponse.builder().week(1).total(1).build();
+        WeekOfCommitDTO weekResponse = WeekOfCommitDTO.builder().week(1).total(1).build();
 
         when(metricsService.getAccumulatedCommitsByWeek(uuid))
                 .thenReturn(List.of(weekResponse));
@@ -123,13 +132,13 @@ public class MetricsControllerTest {
     @Test
     void shouldGetPullRequestsByDate() throws Exception {
         String uuid = "sample";
-        PullRequestSummaryResponse pullRequestSummaryResponse = PullRequestSummaryResponse.builder()
+        PullRequestSummaryDTO pullRequestSummaryDTO = PullRequestSummaryDTO.builder()
                 .date("20020-01-01")
                 .total(10L).
                 build();
 
         when(metricsService.getPullRequestsSummary(uuid))
-                .thenReturn(List.of(pullRequestSummaryResponse));
+                .thenReturn(List.of(pullRequestSummaryDTO));
 
         MockHttpServletResponse response = mockMvc.perform(
                         get("/api/v1/repos/%s/metrics/pull-requests-summary".formatted(uuid))
@@ -140,7 +149,7 @@ public class MetricsControllerTest {
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
 
         assertThat(response.getContentAsString())
-                .isEqualTo(objectMapper.writeValueAsString(List.of(pullRequestSummaryResponse)));
+                .isEqualTo(objectMapper.writeValueAsString(List.of(pullRequestSummaryDTO)));
     }
 
     @Test
@@ -161,13 +170,13 @@ public class MetricsControllerTest {
     @Test
     void shouldGetIssuesByDate() throws Exception {
         String uuid = "sample";
-        IssueSummaryResponse issueSummaryResponse = IssueSummaryResponse.builder()
+        IssueSummaryDTO issueSummaryDTO = IssueSummaryDTO.builder()
                 .date("20020-01-01")
                 .total(10L).
                 build();
 
         when(metricsService.getIssuesSummary(uuid))
-                .thenReturn(List.of(issueSummaryResponse));
+                .thenReturn(List.of(issueSummaryDTO));
 
         MockHttpServletResponse response = mockMvc.perform(
                         get("/api/v1/repos/%s/metrics/issues-summary".formatted(uuid))
@@ -178,7 +187,7 @@ public class MetricsControllerTest {
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
 
         assertThat(response.getContentAsString())
-                .isEqualTo(objectMapper.writeValueAsString(List.of(issueSummaryResponse)));
+                .isEqualTo(objectMapper.writeValueAsString(List.of(issueSummaryDTO)));
     }
 
     @Test

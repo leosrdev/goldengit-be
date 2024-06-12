@@ -2,7 +2,10 @@ package com.goldengit.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.goldengit.application.dto.ProjectDTO;
+import com.goldengit.application.dto.PullRequestDTO;
 import com.goldengit.infra.config.WebConfig;
+import com.goldengit.web.mapper.ProjectResponseMapper;
+import com.goldengit.web.mapper.PullRequestResponseMapper;
 import com.goldengit.web.model.PullRequestResponse;
 import com.goldengit.web.model.ProjectResponse;
 import com.goldengit.application.service.ProjectService;
@@ -20,13 +23,21 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
-@SpringBootTest(classes = {WebConfig.class, ProjectController.class, ObjectMapper.class})
+@SpringBootTest(classes = {
+        WebConfig.class,
+        ProjectService.class,
+        ProjectResponseMapper.class,
+        PullRequestResponseMapper.class,
+        ProjectController.class,
+        ObjectMapper.class
+})
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 public class ProjectControllerTest {
@@ -41,6 +52,7 @@ public class ProjectControllerTest {
     private ProjectResponse projectResponse;
 
     private ProjectDTO projectDTO;
+    private PullRequestDTO pullRequestDTO;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -71,6 +83,14 @@ public class ProjectControllerTest {
                 .defaultBranch("master")
                 .build();
 
+        pullRequestDTO = PullRequestDTO.builder()
+                .id(1)
+                .state("open")
+                .createdAt("2020-01-30")
+                .title("Fixing bugs")
+                .number(1900)
+                .build();
+
         pullRequestResponse = PullRequestResponse.builder()
                 .id(1)
                 .state("open")
@@ -92,13 +112,13 @@ public class ProjectControllerTest {
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
 
         assertThat(response.getContentAsString())
-                .isEqualTo(objectMapper.writeValueAsString(Arrays.asList(projectResponse)));
+                .isEqualTo(objectMapper.writeValueAsString(Collections.singletonList(projectResponse)));
 
     }
 
     @Test
     void shouldListPopularRepos() throws Exception {
-        when(projectService.listPopularProjects()).thenReturn(List.of(projectResponse));
+        when(projectService.listPopularProjects()).thenReturn(List.of(projectDTO));
 
         MockHttpServletResponse response = mockMvc.perform(get("/api/v1/repos/popular")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -108,13 +128,13 @@ public class ProjectControllerTest {
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
 
         assertThat(response.getContentAsString())
-                .isEqualTo(objectMapper.writeValueAsString(Arrays.asList(projectResponse)));
+                .isEqualTo(objectMapper.writeValueAsString(Collections.singletonList(projectDTO)));
 
     }
 
     @Test
     void shouldSearchRepositories() throws Exception {
-        when(projectService.findPullRequestByRepoUuid("uuid")).thenReturn(List.of(pullRequestResponse));
+        when(projectService.findPullRequestByRepoUuid("uuid")).thenReturn(List.of(pullRequestDTO));
         MockHttpServletResponse response = mockMvc.perform(
                         get("/api/v1/repos/%s/pulls".formatted("uuid"))
                                 .contentType(MediaType.APPLICATION_JSON))
@@ -124,7 +144,7 @@ public class ProjectControllerTest {
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
 
         assertThat(response.getContentAsString())
-                .isEqualTo(objectMapper.writeValueAsString(Arrays.asList(pullRequestResponse)));
+                .isEqualTo(objectMapper.writeValueAsString(Collections.singletonList(pullRequestResponse)));
 
     }
 }
