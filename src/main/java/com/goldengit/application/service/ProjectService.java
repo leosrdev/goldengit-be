@@ -64,6 +64,7 @@ public class ProjectService extends BaseService {
     public List<ProjectDTO> listPopularProjects() {
         var popularProjects = projectRepository.findAll();
         var projects = StreamSupport.stream(popularProjects.spliterator(), false)
+                .parallel()
                 .map(project -> projectDataSource.findRepoByFullName(project.getFullName()))
                 .toList();
 

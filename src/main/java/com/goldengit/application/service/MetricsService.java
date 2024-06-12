@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,10 @@ public class MetricsService extends BaseService {
             weekOfCommitDTO.setWeek(weekNumber++);
         }
 
+        if (weekOfCommitList.isEmpty()) {
+            return Collections.emptyList();
+        }
+
         return weekOfCommitList;
     }
 
@@ -45,6 +50,10 @@ public class MetricsService extends BaseService {
         for (WeekOfCommitDTO week : weekOfCommitList) {
             week.setWeek(weekNumber++);
             week.setTotal(numberOfCommits += week.getTotal());
+        }
+
+        if (weekOfCommitList.isEmpty()) {
+            return Collections.emptyList();
         }
 
         return weekOfCommitList;
