@@ -21,6 +21,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class GitHubClient implements ProjectDataSource {
 
+    public static final String GITHUB_URL = "https://api.github.com";
     @Value("${github.api.token}")
     protected String apiToken;
 
@@ -38,7 +39,7 @@ public class GitHubClient implements ProjectDataSource {
         try {
             var repositories = webClientBuilder.build()
                     .get()
-                    .uri(String.format("https://api.github.com/search/repositories?q=%s", query))
+                    .uri(String.format("%s/search/repositories?q=%s", GITHUB_URL, query))
                     .accept(APPLICATION_JSON_GITHUB)
                     .headers(httpHeaders -> httpHeaders.setBearerAuth(apiToken))
                     .retrieve()
@@ -59,7 +60,7 @@ public class GitHubClient implements ProjectDataSource {
         try {
             var repository = webClientBuilder.build()
                     .get()
-                    .uri(String.format("https://api.github.com/repos/%s", fullName))
+                    .uri(String.format("%s/repos/%s", GITHUB_URL, fullName))
                     .accept(APPLICATION_JSON_GITHUB)
                     .headers(httpHeaders -> httpHeaders.setBearerAuth(apiToken))
                     .retrieve()
@@ -84,7 +85,7 @@ public class GitHubClient implements ProjectDataSource {
         try {
             PullRequestSchema[] pullRequestSchemas = webClientBuilder.build()
                     .get()
-                    .uri("https://api.github.com/repos/%s/pulls?state=all&per_page=%s&direction=%s".formatted(fullName, pageSize, direction))
+                    .uri(String.format("%s/repos/%s/pulls?state=all&per_page=%s&direction=%s", GITHUB_URL, fullName, pageSize, direction))
                     .accept(APPLICATION_JSON_GITHUB)
                     .headers(httpHeaders -> httpHeaders.setBearerAuth(apiToken))
                     .retrieve()
@@ -102,7 +103,7 @@ public class GitHubClient implements ProjectDataSource {
         try {
             IssueSchema[] issueSchemas = webClientBuilder.build()
                     .get()
-                    .uri(String.format("https://api.github.com/repos/%s/issues?state=all&per_page=100&direction=desc", fullName))
+                    .uri(String.format("%s/repos/%s/issues?state=all&per_page=100&direction=desc", GITHUB_URL, fullName))
                     .accept(APPLICATION_JSON_GITHUB)
                     .headers(httpHeaders -> httpHeaders.setBearerAuth(apiToken))
                     .retrieve()
@@ -122,7 +123,7 @@ public class GitHubClient implements ProjectDataSource {
         try {
             WeekOfCommitSchema[] weekOfCommits = webClientBuilder.build()
                     .get()
-                    .uri(String.format("https://api.github.com/repos/%s/stats/commit_activity", fullName))
+                    .uri(String.format("%s/repos/%s/stats/commit_activity", GITHUB_URL, fullName))
                     .accept(APPLICATION_JSON_GITHUB)
                     .headers(httpHeaders -> httpHeaders.setBearerAuth(apiToken))
                     .retrieve()
@@ -141,7 +142,7 @@ public class GitHubClient implements ProjectDataSource {
         try {
             ContributorSchema[] contributorSchemas = webClientBuilder.build()
                     .get()
-                    .uri(String.format("https://api.github.com/repos/%s/contributors?per_page=%s", fullName, pageSize))
+                    .uri(String.format("%s/repos/%s/contributors?per_page=%s", GITHUB_URL, fullName, pageSize))
                     .accept(APPLICATION_JSON_GITHUB)
                     .headers(httpHeaders -> httpHeaders.setBearerAuth(apiToken))
                     .retrieve()
@@ -161,7 +162,7 @@ public class GitHubClient implements ProjectDataSource {
         try {
             ReleaseSchema[] releaseSchemas = webClientBuilder.build()
                     .get()
-                    .uri(String.format("https://api.github.com/repos/%s/releases?per_page=%s", fullName, pageSize))
+                    .uri(String.format("%s/repos/%s/releases?per_page=%s", GITHUB_URL, fullName, pageSize))
                     .accept(APPLICATION_JSON_GITHUB)
                     .headers(httpHeaders -> httpHeaders.setBearerAuth(apiToken))
                     .retrieve()
