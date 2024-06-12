@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
 public class ProjectService extends BaseService {
 
     private final ProjectDataSource projectDataSource;
-    private final ProjectRepository repository;
+    private final ProjectRepository projectRepository;
 
     @Cacheable(value = "git-repositories", key = "'projects:' + #uuid")
     protected Project getProjectByUUID(String uuid) throws BadRequestException {
@@ -35,8 +36,8 @@ public class ProjectService extends BaseService {
 
     @Cacheable("git-repositories")
     public Project findOrCreate(String fullName) {
-        Optional<Project> optionalGitProject = repository.findByFullName(fullName);
-        return optionalGitProject.orElseGet(() -> repository.save(
+        Optional<Project> optionalGitProject = projectRepository.findByFullName(fullName);
+        return optionalGitProject.orElseGet(() -> projectRepository.save(
                 Project.builder()
                         .uuid(UUID.randomUUID().toString())
                         .fullName(fullName)
@@ -45,7 +46,7 @@ public class ProjectService extends BaseService {
     }
 
     public Optional<Project> findById(String uuid) {
-        return repository.findById(uuid);
+        return projectRepository.findById(uuid);
     }
 
     @Cacheable("git-repositories")
@@ -61,11 +62,9 @@ public class ProjectService extends BaseService {
 
     @Cacheable(value = "git-repositories", key = "'popularRepositories'")
     public List<ProjectDTO> listPopularProjects() {
-        List<String> popularRepositories = getPopularProjectsList();
-        List<Optional<ProjectDTO>> projects = popularRepositories
-                .stream()
-                .parallel()
-                .map(projectDataSource::findRepoByFullName)
+        var popularProjects = projectRepository.findAll();
+        var projects = StreamSupport.stream(popularProjects.spliterator(), false)
+                .map(project -> projectDataSource.findRepoByFullName(project.getFullName()))
                 .toList();
 
         return projects.stream()
@@ -77,31 +76,5 @@ public class ProjectService extends BaseService {
                 })
                 .sorted((r1, r2) -> Integer.compare(r2.getStars(), r1.getStars()))
                 .collect(Collectors.toList());
-    }
-
-    private List<String> getPopularProjectsList() {
-        var projects = new String[]{
-                "twbs/bootstrap",
-                "microsoft/TypeScript",
-                "facebook/react",
-                "vercel/next.js",
-                "spring-projects/spring-boot",
-                "nodejs/node",
-                "expressjs/express",
-                "angular/angular",
-                "php/php-src",
-                "ollama/ollama",
-                "django/django",
-                "pytorch/pytorch",
-                "tensorflow/tensorflow",
-                "vitejs/vite",
-                "apache/spark",
-                "apache/kafka",
-                "grafana/grafana",
-                "open-webui/open-webui",
-                "mysql/mysql-server",
-                "mongodb/mongo"
-        };
-        return Arrays.asList(projects);
     }
 }
