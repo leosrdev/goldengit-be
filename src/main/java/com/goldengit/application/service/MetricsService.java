@@ -1,13 +1,7 @@
 package com.goldengit.application.service;
 
+import com.goldengit.application.dto.*;
 import com.goldengit.domain.model.Project;
-import com.goldengit.infra.api.github.client.GitHubClient;
-import com.goldengit.infra.api.github.schema.IssueSchema;
-import com.goldengit.infra.api.github.schema.PullRequestSchema;
-import com.goldengit.infra.api.github.schema.WeekOfCommitSchema;
-import com.goldengit.web.model.IssueSummaryResponse;
-import com.goldengit.web.model.PullRequestSummaryResponse;
-import com.goldengit.web.model.WeekOfCommitResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
@@ -27,57 +21,49 @@ import java.util.stream.Collectors;
 @Slf4j
 public class MetricsService extends BaseService {
 
-    private final GitHubClient gitApi;
+    private final ProjectDataSource projectDataSource;
     private final ProjectService projectService;
 
     @Cacheable(value = "git-repositories", key = "'commitActivityByWeek:' + #uuid")
-    public List<WeekOfCommitResponse> getCommitActivityByWeek(String uuid) throws BadRequestException {
+    public List<WeekOfCommitDTO> getCommitActivityByWeek(String uuid) throws BadRequestException {
         Project project = projectService.getProjectByUUID(uuid);
-        List<WeekOfCommitSchema> weekOfCommitSchemas = gitApi.getCommitActivity(project.getFullName());
+        List<WeekOfCommitDTO> weekOfCommitList = projectDataSource.getCommitActivity(project.getFullName());
         int weekNumber = 1;
-        for (WeekOfCommitSchema weekOfCommitSchema : weekOfCommitSchemas) {
-            weekOfCommitSchema.week = weekNumber++;
+        for (WeekOfCommitDTO weekOfCommitDTO : weekOfCommitList) {
+            weekOfCommitDTO.setWeek(weekNumber++);
         }
 
-        return weekOfCommitSchemas.stream().parallel()
-                .map(weekOfCommitSchema -> WeekOfCommitResponse.builder()
-                        .week(weekOfCommitSchema.week)
-                        .total(weekOfCommitSchema.total)
-                        .build()).collect(Collectors.toList());
+        return weekOfCommitList;
     }
 
     @Cacheable(value = "git-repositories", key = "'accumulatedCommitsByWeek:' + #uuid")
-    public List<WeekOfCommitResponse> getAccumulatedCommitsByWeek(String uuid) throws BadRequestException {
+    public List<WeekOfCommitDTO> getAccumulatedCommitsByWeek(String uuid) throws BadRequestException {
         Project project = projectService.getProjectByUUID(uuid);
-        List<WeekOfCommitSchema> weekOfCommitSchemas = gitApi.getCommitActivity(project.getFullName());
+        List<WeekOfCommitDTO> weekOfCommitList = projectDataSource.getCommitActivity(project.getFullName());
         int weekNumber = 1;
-        int numberOfCommits = 0;
-        for (WeekOfCommitSchema week : weekOfCommitSchemas) {
-            week.week = weekNumber++;
-            week.total = (numberOfCommits += week.total);
+        long numberOfCommits = 0;
+        for (WeekOfCommitDTO week : weekOfCommitList) {
+            week.setWeek(weekNumber++);
+            week.setTotal(numberOfCommits += week.getTotal());
         }
 
-        return weekOfCommitSchemas.stream().parallel()
-                .map(weekOfCommitSchema -> WeekOfCommitResponse.builder()
-                        .week(weekOfCommitSchema.week)
-                        .total(weekOfCommitSchema.total)
-                        .build()).collect(Collectors.toList());
+        return weekOfCommitList;
     }
 
     @Cacheable(value = "git-repositories", key = "'pullRequestsSummary:' + #uuid")
-    public List<PullRequestSummaryResponse> getPullRequestsSummary(String uuid) throws BadRequestException {
+    public List<PullRequestSummaryDTO> getPullRequestsSummary(String uuid) throws BadRequestException {
         Project project = projectService.getProjectByUUID(uuid);
-        List<PullRequestSchema> pullRequestSchemas = gitApi.findAllPullRequestByRepoName(project.getFullName());
-        Map<String, Long> pullRequestsGroupedByCreatedDate = pullRequestSchemas
+        List<PullRequestDTO> pullRequestList = projectDataSource.findAllPullRequestByRepoName(project.getFullName());
+        Map<String, Long> pullRequestsGroupedByCreatedDate = pullRequestList
                 .stream()
                 .parallel()
                 .collect(Collectors.groupingByConcurrent(
-                        pullRequestSchema -> dateFormat(pullRequestSchema.created_at),
+                        pullRequestDTO -> dateFormat(pullRequestDTO.getCreatedAt()),
                         Collectors.counting()
                 ));
 
         return pullRequestsGroupedByCreatedDate.entrySet().stream()
-                .map(entry -> PullRequestSummaryResponse.builder()
+                .map(entry -> PullRequestSummaryDTO.builder()
                         .date(entry.getKey())
                         .total(entry.getValue())
                         .build())
@@ -86,19 +72,19 @@ public class MetricsService extends BaseService {
     }
 
     @Cacheable(value = "git-repositories", key = "'issuesSummary:' + #uuid")
-    public List<IssueSummaryResponse> getIssuesSummary(String uuid) throws BadRequestException {
+    public List<IssueSummaryDTO> getIssuesSummary(String uuid) throws BadRequestException {
         Project project = projectService.getProjectByUUID(uuid);
-        List<IssueSchema> issueSchemas = gitApi.findAllIssuesByRepoName(project.getFullName());
+        List<IssueDTO> issueSchemas = projectDataSource.findAllIssuesByRepoName(project.getFullName());
         Map<String, Long> issuesGroupedByCreatedDate = issueSchemas
                 .stream()
                 .parallel()
                 .collect(Collectors.groupingByConcurrent(
-                        issueSchema -> dateFormat(issueSchema.created_at),
+                        issueDTO -> dateFormat(issueDTO.getCreatedAt()),
                         Collectors.counting()
                 ));
 
         return issuesGroupedByCreatedDate.entrySet().stream()
-                .map(entry -> IssueSummaryResponse.builder()
+                .map(entry -> IssueSummaryDTO.builder()
                         .date(entry.getKey())
                         .total(entry.getValue())
                         .build())

@@ -1,32 +1,27 @@
 package com.goldengit.application.service;
 
+import com.goldengit.application.dto.ProjectDTO;
+import com.goldengit.application.dto.PullRequestDTO;
 import com.goldengit.domain.model.Project;
-import com.goldengit.infra.api.github.client.GitHubClient;
-import com.goldengit.infra.api.github.schema.PullRequestSchema;
-import com.goldengit.infra.api.github.schema.RepositoriesSchema;
-import com.goldengit.infra.api.github.schema.RepositorySchema;
 import com.goldengit.infra.db.ProjectRepository;
-import com.goldengit.web.model.PullRequestResponse;
-import com.goldengit.web.model.RepoResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class ProjectService extends BaseService {
 
-    private final GitHubClient gitApi;
+    private final ProjectDataSource projectDataSource;
     private final ProjectRepository repository;
 
     @Cacheable(value = "git-repositories", key = "'projects:' + #uuid")
@@ -54,47 +49,38 @@ public class ProjectService extends BaseService {
     }
 
     @Cacheable("git-repositories")
-    public List<RepoResponse> findRepoByQuery(String query) {
-        RepositoriesSchema repositoriesSchema = gitApi.findRepoByQuery(query);
-
-        return repositoriesSchema.getItems().stream().map(repositorySchema ->
-                RepoResponse.builder()
-                        .fullName(repositorySchema.full_name)
-                        .description(repositorySchema.description)
-                        .stars(repositorySchema.stargazers_count)
-                        .forks(repositorySchema.forks_count)
-                        .watchers(repositorySchema.watchers_count)
-                        .defaultBranch(repositorySchema.default_branch)
-                        .openIssues(repositorySchema.open_issues_count)
-                        .build()
-        ).collect(Collectors.toList());
+    public List<ProjectDTO> findRepoByQuery(String query) {
+        return projectDataSource.findProjectsByQuery(query);
     }
 
     @Cacheable(value = "git-repositories", key = "'pullRequests:' + #uuid")
-    public List<PullRequestResponse> findPullRequestByRepoUuid(String uuid) throws BadRequestException {
+    public List<PullRequestDTO> findPullRequestByRepoUuid(String uuid) throws BadRequestException {
         Project project = getProjectByUUID(uuid);
-        List<PullRequestSchema> pullRequestSchemas = gitApi.findAllPullRequestByRepoName(project.getFullName(), 15, "desc");
-        return pullRequestSchemas.stream().map(pullRequestSchema ->
-                PullRequestResponse.builder()
-                        .id(pullRequestSchema.id)
-                        .number(pullRequestSchema.number)
-                        .htmlUrl(pullRequestSchema.html_url)
-                        .title(pullRequestSchema.title)
-                        .state(pullRequestSchema.state)
-                        .createdAt(pullRequestSchema.created_at)
-                        .closedAt(pullRequestSchema.closed_at)
-                        //.body(pullRequest.body)
-                        .userLogin(pullRequestSchema.user.login)
-                        .userHtmlUrl(pullRequestSchema.user.html_url)
-                        .userAvatarUrl(pullRequestSchema.user.avatar_url)
-                        .build()
-        ).collect(Collectors.toList());
+        return projectDataSource.findAllPullRequestByRepoName(project.getFullName(), 15, "desc");
     }
 
-
     @Cacheable(value = "git-repositories", key = "'popularRepositories'")
-    public List<RepoResponse> listPopularRepositories() {
-        String[] popularRepositories = new String[]{
+    public List<ProjectDTO> listPopularProjects() {
+        List<String> popularRepositories = getPopularProjectsList();
+        List<Optional<ProjectDTO>> projects = popularRepositories
+                .stream()
+                .parallel()
+                .map(projectDataSource::findRepoByFullName)
+                .toList();
+
+        return projects.stream()
+                .filter(Optional::isPresent)
+                .map(project -> {
+                    Project gitProject = findOrCreate(project.get().getFullName());
+                    project.get().setUuid(gitProject.getUuid());
+                    return project.get();
+                })
+                .sorted((r1, r2) -> Integer.compare(r2.getStars(), r1.getStars()))
+                .collect(Collectors.toList());
+    }
+
+    private List<String> getPopularProjectsList() {
+        var projects = new String[]{
                 "twbs/bootstrap",
                 "microsoft/TypeScript",
                 "facebook/react",
@@ -116,34 +102,6 @@ public class ProjectService extends BaseService {
                 "mysql/mysql-server",
                 "mongodb/mongo"
         };
-
-        List<RepositorySchema> repos = Stream.of(popularRepositories).parallel()
-                .map(name -> {
-                    try {
-                        return gitApi.findRepoByFullName(name);
-                    } catch (Exception exception) {
-                        log.error("Error when fetching data, repository: " + name + ", error: " + exception.getMessage());
-                        return null;
-                    }
-                }).toList();
-        return repos.stream()
-                .filter(Objects::nonNull)
-                .map(repositorySchema -> {
-                    Project gitProject = findOrCreate(repositorySchema.full_name);
-                    return RepoResponse.builder()
-                            .uuid(gitProject.getUuid())
-                            .name(repositorySchema.name)
-                            .fullName(repositorySchema.full_name)
-                            .description(repositorySchema.description)
-                            .avatarUrl(repositorySchema.owner.avatar_url)
-                            .stars(repositorySchema.stargazers_count)
-                            .forks(repositorySchema.forks_count)
-                            .watchers(repositorySchema.watchers_count)
-                            .defaultBranch(repositorySchema.default_branch)
-                            .openIssues(repositorySchema.open_issues_count)
-                            .build();
-                })
-                .sorted((r1, r2) -> Integer.compare(r2.getStars(), r1.getStars()))
-                .collect(Collectors.toList());
+        return Arrays.asList(projects);
     }
 }

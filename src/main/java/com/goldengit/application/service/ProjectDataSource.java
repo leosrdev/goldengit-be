@@ -1,0 +1,24 @@
+package com.goldengit.application.service;
+
+import com.goldengit.application.dto.*;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface ProjectDataSource {
+    List<ProjectDTO> findProjectsByQuery(String query);
+
+    Optional<ProjectDTO> findRepoByFullName(String fullName);
+
+    List<PullRequestDTO> findAllPullRequestByRepoName(String fullName);
+
+    List<PullRequestDTO> findAllPullRequestByRepoName(String fullName, int pageSize, String direction);
+
+    List<IssueDTO> findAllIssuesByRepoName(String fullName);
+
+    List<WeekOfCommitDTO> getCommitActivity(String fullName);
+
+    List<ContributorDTO> findAllContributorsByRepoName(String fullName, int pageSize);
+
+    List<ReleaseDTO> findAllReleasesByRepoName(String fullName, int pageSize);
+}

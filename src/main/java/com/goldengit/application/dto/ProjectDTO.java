@@ -1,4 +1,4 @@
-package com.goldengit.web.model;
+package com.goldengit.application.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class RepoResponse {
+public class ProjectDTO {
     private String uuid;
     private String name;
     private String fullName;

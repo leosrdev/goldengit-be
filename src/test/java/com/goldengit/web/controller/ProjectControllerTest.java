@@ -1,9 +1,10 @@
 package com.goldengit.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.goldengit.application.dto.ProjectDTO;
 import com.goldengit.infra.config.WebConfig;
 import com.goldengit.web.model.PullRequestResponse;
-import com.goldengit.web.model.RepoResponse;
+import com.goldengit.web.model.ProjectResponse;
 import com.goldengit.application.service.ProjectService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,7 +38,9 @@ public class ProjectControllerTest {
     @Autowired
     private ProjectController projectController;
 
-    private RepoResponse repoResponse;
+    private ProjectResponse projectResponse;
+
+    private ProjectDTO projectDTO;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -48,7 +51,17 @@ public class ProjectControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(projectController)
                 .build();
 
-        repoResponse = RepoResponse.builder()
+        projectDTO = ProjectDTO.builder()
+                .fullName("spring/spring-boot")
+                .openIssues(5)
+                .watchers(100)
+                .forks(50)
+                .stars(1000)
+                .description("Project beta")
+                .defaultBranch("master")
+                .build();
+
+        projectResponse = ProjectResponse.builder()
                 .fullName("spring/spring-boot")
                 .openIssues(5)
                 .watchers(100)
@@ -69,7 +82,7 @@ public class ProjectControllerTest {
 
     @Test
     void shouldListPullRequests() throws Exception {
-        when(projectService.findRepoByQuery("spring")).thenReturn(List.of(repoResponse));
+        when(projectService.findRepoByQuery("spring")).thenReturn(List.of(projectDTO));
 
         MockHttpServletResponse response = mockMvc.perform(get(String.format("/api/v1/repos/search?q=%s", "spring"))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -79,13 +92,13 @@ public class ProjectControllerTest {
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
 
         assertThat(response.getContentAsString())
-                .isEqualTo(objectMapper.writeValueAsString(Arrays.asList(repoResponse)));
+                .isEqualTo(objectMapper.writeValueAsString(Arrays.asList(projectResponse)));
 
     }
 
     @Test
     void shouldListPopularRepos() throws Exception {
-        when(projectService.listPopularRepositories()).thenReturn(List.of(repoResponse));
+        when(projectService.listPopularProjects()).thenReturn(List.of(projectResponse));
 
         MockHttpServletResponse response = mockMvc.perform(get("/api/v1/repos/popular")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -95,7 +108,7 @@ public class ProjectControllerTest {
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
 
         assertThat(response.getContentAsString())
-                .isEqualTo(objectMapper.writeValueAsString(Arrays.asList(repoResponse)));
+                .isEqualTo(objectMapper.writeValueAsString(Arrays.asList(projectResponse)));
 
     }
 
