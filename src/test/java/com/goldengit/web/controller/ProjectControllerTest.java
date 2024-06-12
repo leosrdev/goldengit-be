@@ -3,12 +3,12 @@ package com.goldengit.web.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.goldengit.application.dto.ProjectDTO;
 import com.goldengit.application.dto.PullRequestDTO;
+import com.goldengit.application.service.ProjectService;
 import com.goldengit.infra.config.WebConfig;
 import com.goldengit.web.mapper.ProjectResponseMapper;
 import com.goldengit.web.mapper.PullRequestResponseMapper;
-import com.goldengit.web.model.PullRequestResponse;
 import com.goldengit.web.model.ProjectResponse;
-import com.goldengit.application.service.ProjectService;
+import com.goldengit.web.model.PullRequestResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
