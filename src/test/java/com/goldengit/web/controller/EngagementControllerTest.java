@@ -2,9 +2,13 @@ package com.goldengit.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.goldengit.application.dto.ContributorDTO;
+import com.goldengit.application.dto.IssueDTO;
+import com.goldengit.application.dto.PullRequestDTO;
 import com.goldengit.application.service.EngagementService;
 import com.goldengit.infra.config.WebConfig;
 import com.goldengit.web.mapper.ContributorResponseMapper;
+import com.goldengit.web.mapper.IssueResponseMapper;
+import com.goldengit.web.mapper.PullRequestResponseMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +31,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
         WebConfig.class,
         EngagementService.class,
         ContributorResponseMapper.class,
+        PullRequestResponseMapper.class,
+        IssueResponseMapper.class,
         EngagementController.class,
         ObjectMapper.class
 })
@@ -44,7 +50,14 @@ public class EngagementControllerTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    ContributorResponseMapper contributorResponseMapper;
+    private ContributorResponseMapper contributorResponseMapper;
+
+    @Autowired
+    private PullRequestResponseMapper pullRequestResponseMapper;
+
+    @Autowired
+    private IssueResponseMapper issueResponseMapper;
+
 
     @BeforeEach
     void setup() {
@@ -70,5 +83,45 @@ public class EngagementControllerTest {
 
         assertThat(response.getContentAsString())
                 .isEqualTo(objectMapper.writeValueAsString(List.of(contributorResponse)));
+    }
+
+    @Test
+    public void shouldGeneratePullRequestsCycleTime() throws Exception {
+        String uuid = "sample";
+        var pullRequests = List.of(PullRequestDTO.builder().id(1).number(10).build());
+        var pullRequestResponse = pullRequestResponseMapper.mapList(pullRequests);
+
+        when(engagementService.findMergedPullRequests(uuid))
+                .thenReturn(pullRequests);
+
+        MockHttpServletResponse response = mockMvc.perform(
+                        get("/api/v1/repos/%s/engagement/pull-request-cycle".formatted(uuid))
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andReturn()
+                .getResponse();
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+
+        assertThat(response.getContentAsString())
+                .isEqualTo(objectMapper.writeValueAsString(pullRequestResponse));
+    }
+
+    @Test
+    public void shouldGenerateIssuesCycleTime() throws Exception {
+        String uuid = "sample";
+        var issues = List.of(IssueDTO.builder().id(1).number(10).build());
+        var issueResponse = issueResponseMapper.mapList(issues);
+
+        when(engagementService.findSolvedIssues(uuid))
+                .thenReturn(issues);
+
+        MockHttpServletResponse response = mockMvc.perform(
+                        get("/api/v1/repos/%s/engagement/issue-cycle".formatted(uuid))
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andReturn()
+                .getResponse();
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+
+        assertThat(response.getContentAsString())
+                .isEqualTo(objectMapper.writeValueAsString(issueResponse));
     }
 }

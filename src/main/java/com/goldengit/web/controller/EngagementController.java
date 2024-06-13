@@ -3,7 +3,6 @@ package com.goldengit.web.controller;
 import com.goldengit.application.service.EngagementService;
 import com.goldengit.web.mapper.ContributorResponseMapper;
 import com.goldengit.web.mapper.IssueResponseMapper;
-import com.goldengit.web.mapper.IssueSummaryResponseMapper;
 import com.goldengit.web.mapper.PullRequestResponseMapper;
 import com.goldengit.web.model.ContributorResponse;
 import com.goldengit.web.model.IssueResponse;

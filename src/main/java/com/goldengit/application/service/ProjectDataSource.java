@@ -2,7 +2,6 @@ package com.goldengit.application.service;
 
 import com.goldengit.application.dto.*;
 import com.goldengit.application.query.FindIssueQuery;
-import org.kohsuke.github.GHIssueState;
 
 import java.util.List;
 import java.util.Optional;
