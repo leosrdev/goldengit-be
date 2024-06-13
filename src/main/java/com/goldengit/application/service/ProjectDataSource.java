@@ -14,6 +14,8 @@ public interface ProjectDataSource {
 
     List<PullRequestDTO> findAllPullRequestByRepoName(String fullName, int maxResults);
 
+    List<PullRequestDTO> findMergedPullRequestByRepoName(String fullName, int maxResults);
+
     List<IssueDTO> findAllIssuesByRepoName(String fullName);
 
     List<WeekOfCommitDTO> getCommitActivity(String fullName);

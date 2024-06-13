@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.goldengit.domain.common.DateUtil.DATE_FORMAT_UTC;
+
 public abstract class SchemaMapper<ApiSchema, DTO> {
     protected abstract DTO map(ApiSchema schema);
 
@@ -19,7 +21,7 @@ public abstract class SchemaMapper<ApiSchema, DTO> {
         if (date == null) {
             return "";
         }
-        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        DateFormat formatter = new SimpleDateFormat(DATE_FORMAT_UTC);
         return formatter.format(date);
     }
 }

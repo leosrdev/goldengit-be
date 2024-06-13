@@ -59,7 +59,20 @@ public class GitHubClient implements ProjectDataSource {
 
     public List<PullRequestDTO> findAllPullRequestByRepoName(String fullName, int maxResults) {
         try {
-            PagedIterable<GHPullRequest> pagedIterable = gitHubApi.getRepository(fullName).queryPullRequests().list();
+            PagedIterable<GHPullRequest> pagedIterable = gitHubApi.getRepository(fullName)
+                    .queryPullRequests().list();
+            var pulls = fetchRecords(pagedIterable, maxResults);
+            return pullRequestSchemaMapper.mapList(pulls);
+        } catch (Exception exception) {
+            log.error(exception.getMessage());
+            return Collections.emptyList();
+        }
+    }
+
+    public List<PullRequestDTO> findMergedPullRequestByRepoName(String fullName, int maxResults) {
+        try {
+            PagedIterable<GHPullRequest> pagedIterable = gitHubApi.getRepository(fullName)
+                    .searchPullRequests().isMerged().list();
             var pulls = fetchRecords(pagedIterable, maxResults);
             return pullRequestSchemaMapper.mapList(pulls);
         } catch (Exception exception) {

@@ -21,4 +21,5 @@ public class PullRequestResponse {
     private String userLogin;
     private String userHtmlUrl;
     private String userAvatarUrl;
+    private float cycleTimeDays;
 }

@@ -2,7 +2,9 @@ package com.goldengit.web.controller;
 
 import com.goldengit.application.service.EngagementService;
 import com.goldengit.web.mapper.ContributorResponseMapper;
+import com.goldengit.web.mapper.PullRequestResponseMapper;
 import com.goldengit.web.model.ContributorResponse;
+import com.goldengit.web.model.PullRequestResponse;
 import lombok.AllArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
@@ -21,6 +23,7 @@ import java.util.List;
 public class EngagementController {
     private final EngagementService engagementService;
     private final ContributorResponseMapper contributorResponseMapper;
+    private final PullRequestResponseMapper pullRequestResponseMapper;
 
     @GetMapping(value = "/{uuid}/engagement/contributors", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<ContributorResponse>> getRepositoryContributors(@PathVariable("uuid") String uuid) {
@@ -28,6 +31,17 @@ public class EngagementController {
             var contributors = engagementService.findTopContributorsByRepo(uuid);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(contributorResponseMapper.mapList(contributors));
+        } catch (BadRequestException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping(value = "/{uuid}/engagement/pull-request-cycle", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<PullRequestResponse>> generatePullRequestsCycleTime(@PathVariable("uuid") String uuid) {
+        try {
+            var pullRequests = engagementService.calculatePullRequestsCycleTime(uuid);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(pullRequestResponseMapper.mapList(pullRequests));
         } catch (BadRequestException e) {
             return ResponseEntity.badRequest().build();
         }
