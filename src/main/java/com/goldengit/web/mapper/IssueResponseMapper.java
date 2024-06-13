@@ -14,6 +14,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
 import static com.goldengit.domain.common.DateUtil.DATE_FORMAT_UTC;
+import static com.goldengit.domain.common.DateUtil.calculateCycleTime;
 
 @Component
 public class IssueResponseMapper extends ResponseMapper<IssueDTO, IssueResponse> {
@@ -27,15 +28,5 @@ public class IssueResponseMapper extends ResponseMapper<IssueDTO, IssueResponse>
             );
         }
         return response;
-    }
-
-    private float calculateCycleTime(String start, String end) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT_UTC);
-        LocalDateTime startDateTime = LocalDateTime.parse(start, formatter);
-        LocalDateTime endDateTime = LocalDateTime.parse(end, formatter);
-        long hours = ChronoUnit.HOURS.between(startDateTime, endDateTime);
-        float days = (float) hours / 24;
-        DecimalFormat df = new DecimalFormat("#.#");
-        return Float.parseFloat(df.format(days));
     }
 }

@@ -22,7 +22,7 @@ public class ProjectOverviewService extends BaseService {
     @Cacheable(value = "ai-generation", key = "'projectSummary:' + #uuid")
     public ProjectSummaryDTO generateProjectSummary(String uuid) throws BadRequestException {
         Project project = projectService.getProjectByUUID(uuid);
-        List<PullRequestDTO> pullRequests = projectService.findPullRequestByRepoUuid(uuid);
+        List<PullRequestDTO> pullRequests = projectDataSource.findMergedPullRequestByRepoName(project.getFullName(), 20);
         List<String> titles = pullRequests.stream().map(PullRequestDTO::getTitle).toList();
         String lastChanges = openAiClient.generateProjectSummaryFromPullRequests(project.getFullName(), titles);
         String description = openAiClient.generateProjectDescription(project.getFullName());
