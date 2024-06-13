@@ -2,23 +2,29 @@ package com.goldengit.infra.api.github.mapper;
 
 import com.goldengit.application.dto.ProjectDTO;
 import com.goldengit.application.mapper.SchemaMapper;
-import com.goldengit.infra.api.github.schema.RepositorySchema;
+import org.kohsuke.github.GHRepository;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+
 @Component
-public class ProjectSchemaMapper extends SchemaMapper<RepositorySchema, ProjectDTO> {
+public class ProjectSchemaMapper extends SchemaMapper<GHRepository, ProjectDTO> {
     @Override
-    public ProjectDTO map(RepositorySchema schema) {
-        return ProjectDTO.builder()
-                .fullName(schema.full_name)
-                .name(schema.name)
-                .description(schema.description)
-                .avatarUrl(schema.owner.avatar_url)
-                .stars(schema.stargazers_count)
-                .forks(schema.forks_count)
-                .watchers(schema.watchers_count)
-                .defaultBranch(schema.default_branch)
-                .openIssues(schema.open_issues_count)
-                .build();
+    public ProjectDTO map(GHRepository repository) {
+        try {
+            return ProjectDTO.builder()
+                    .fullName(repository.getFullName())
+                    .name(repository.getName())
+                    .description(repository.getDescription())
+                    .avatarUrl(repository.getOwner().getAvatarUrl())
+                    .stars(repository.getStargazersCount())
+                    .forks(repository.getForksCount())
+                    .watchers(repository.getWatchersCount())
+                    .defaultBranch(repository.getDefaultBranch())
+                    .openIssues(repository.getOpenIssueCount())
+                    .build();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

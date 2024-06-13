@@ -13,10 +13,9 @@ public class ReleaseDTO {
     private String name;
     private String tagName;
     private String htmlUrl;
-    private String userLogin;
-    private String userHtmlUrl;
-    private String userAvatarUrl;
+    private String assetsUrl;
+    private String createdAt;
     private String publishedAt;
     private String targetBranch;
-    private String draft;
+    private Boolean draft;
 }

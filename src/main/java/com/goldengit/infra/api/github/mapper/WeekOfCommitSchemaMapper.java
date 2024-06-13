@@ -2,16 +2,16 @@ package com.goldengit.infra.api.github.mapper;
 
 import com.goldengit.application.dto.WeekOfCommitDTO;
 import com.goldengit.application.mapper.SchemaMapper;
-import com.goldengit.infra.api.github.schema.WeekOfCommitSchema;
+import org.kohsuke.github.GHRepositoryStatistics;
 import org.springframework.stereotype.Component;
 
 @Component
-public class WeekOfCommitSchemaMapper extends SchemaMapper<WeekOfCommitSchema, WeekOfCommitDTO> {
+public class WeekOfCommitSchemaMapper extends SchemaMapper<GHRepositoryStatistics.CommitActivity, WeekOfCommitDTO> {
     @Override
-    protected WeekOfCommitDTO map(WeekOfCommitSchema schema) {
+    protected WeekOfCommitDTO map(GHRepositoryStatistics.CommitActivity commitActivity) {
         return WeekOfCommitDTO.builder()
-                .week(schema.week)
-                .total(schema.total)
+                .week(commitActivity.getWeek())
+                .total(commitActivity.getTotal())
                 .build();
     }
 }

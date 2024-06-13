@@ -3,16 +3,16 @@ package com.goldengit.infra.api.github.client;
 import com.goldengit.application.dto.*;
 import com.goldengit.application.service.ProjectDataSource;
 import com.goldengit.infra.api.github.mapper.*;
-import com.goldengit.infra.api.github.schema.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
+import org.kohsuke.github.GHPullRequest;
+import org.kohsuke.github.GitHub;
+import org.kohsuke.github.PagedIterable;
+import org.kohsuke.github.PagedIterator;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,14 +20,7 @@ import java.util.Optional;
 @Slf4j
 @RequiredArgsConstructor
 public class GitHubClient implements ProjectDataSource {
-
-    public static final String GITHUB_URL = "https://api.github.com";
-    @Value("${github.api.token}")
-    protected String apiToken;
-
-    private final WebClient.Builder webClientBuilder;
-    protected final static MediaType APPLICATION_JSON_GITHUB = MediaType.valueOf("application/vnd.github+json");
-
+    private final GitHub gitHubApi;
     private final ProjectSchemaMapper projectSchemaMapper;
     private final PullRequestSchemaMapper pullRequestSchemaMapper;
     private final IssueSchemaMapper issueSchemaMapper;
@@ -37,39 +30,22 @@ public class GitHubClient implements ProjectDataSource {
 
     public List<ProjectDTO> findProjectsByQuery(String query) {
         try {
-            var repositories = webClientBuilder.build()
-                    .get()
-                    .uri(String.format("%s/search/repositories?q=%s", GITHUB_URL, query))
-                    .accept(APPLICATION_JSON_GITHUB)
-                    .headers(httpHeaders -> httpHeaders.setBearerAuth(apiToken))
-                    .retrieve()
-                    .bodyToMono(RepositoriesSchema.class)
-                    .block();
-
-            return repositories != null ?
-                    projectSchemaMapper.mapList(repositories.getItems()) :
-                    List.of();
-
+            // TODO: warning: for each result a request will be made to get repo data from API
+            var pagedSearchIterable = gitHubApi.searchRepositories().q(query).list();
+            var repositories = fetchRecords(pagedSearchIterable, 50);
+            return projectSchemaMapper.mapList(repositories);
         } catch (Exception exception) {
             log.error(exception.getMessage(), exception.getCause());
-            return List.of();
+            return Collections.emptyList();
         }
     }
 
     public Optional<ProjectDTO> findRepoByFullName(String fullName) {
         try {
-            var repository = webClientBuilder.build()
-                    .get()
-                    .uri(String.format("%s/repos/%s", GITHUB_URL, fullName))
-                    .accept(APPLICATION_JSON_GITHUB)
-                    .headers(httpHeaders -> httpHeaders.setBearerAuth(apiToken))
-                    .retrieve()
-                    .bodyToMono(RepositorySchema.class)
-                    .block();
+            var repository = gitHubApi.getRepository(fullName);
             if (repository == null) {
                 return Optional.empty();
             }
-
             return Optional.of(projectSchemaMapper.map(repository));
         } catch (Exception exception) {
             log.error(exception.getMessage());
@@ -78,102 +54,70 @@ public class GitHubClient implements ProjectDataSource {
     }
 
     public List<PullRequestDTO> findAllPullRequestByRepoName(String fullName) {
-        return findAllPullRequestByRepoName(fullName, 100, "desc");
+        return findAllPullRequestByRepoName(fullName, 100);
     }
 
-    public List<PullRequestDTO> findAllPullRequestByRepoName(String fullName, int pageSize, String direction) {
+    public List<PullRequestDTO> findAllPullRequestByRepoName(String fullName, int maxResults) {
         try {
-            PullRequestSchema[] pullRequestSchemas = webClientBuilder.build()
-                    .get()
-                    .uri(String.format("%s/repos/%s/pulls?state=all&per_page=%s&direction=%s", GITHUB_URL, fullName, pageSize, direction))
-                    .accept(APPLICATION_JSON_GITHUB)
-                    .headers(httpHeaders -> httpHeaders.setBearerAuth(apiToken))
-                    .retrieve()
-                    .bodyToMono(PullRequestSchema[].class)
-                    .block();
-            return pullRequestSchemas != null ? pullRequestSchemaMapper
-                    .mapList(Arrays.asList(pullRequestSchemas)) : List.of();
-        } catch (WebClientResponseException exception) {
+            PagedIterable<GHPullRequest> pagedIterable = gitHubApi.getRepository(fullName).queryPullRequests().list();
+            var pulls = fetchRecords(pagedIterable, maxResults);
+            return pullRequestSchemaMapper.mapList(pulls);
+        } catch (Exception exception) {
             log.error(exception.getMessage());
-            return List.of();
+            return Collections.emptyList();
         }
     }
 
     public List<IssueDTO> findAllIssuesByRepoName(String fullName) {
         try {
-            IssueSchema[] issueSchemas = webClientBuilder.build()
-                    .get()
-                    .uri(String.format("%s/repos/%s/issues?state=all&per_page=100&direction=desc", GITHUB_URL, fullName))
-                    .accept(APPLICATION_JSON_GITHUB)
-                    .headers(httpHeaders -> httpHeaders.setBearerAuth(apiToken))
-                    .retrieve()
-                    .bodyToMono(IssueSchema[].class)
-                    .block();
-
-            return issueSchemas != null ?
-                    issueSchemaMapper.mapList(Arrays.asList(issueSchemas)) :
-                    List.of();
-        } catch (WebClientResponseException exception) {
+            var pagedIterable = gitHubApi.getRepository(fullName).queryIssues().list();
+            var issues = fetchRecords(pagedIterable, 100);
+            return issueSchemaMapper.mapList(issues);
+        } catch (Exception exception) {
             log.error(exception.getMessage());
-            return List.of();
+            return Collections.emptyList();
         }
     }
 
     public List<WeekOfCommitDTO> getCommitActivity(String fullName) {
         try {
-            WeekOfCommitSchema[] weekOfCommits = webClientBuilder.build()
-                    .get()
-                    .uri(String.format("%s/repos/%s/stats/commit_activity", GITHUB_URL, fullName))
-                    .accept(APPLICATION_JSON_GITHUB)
-                    .headers(httpHeaders -> httpHeaders.setBearerAuth(apiToken))
-                    .retrieve()
-                    .bodyToMono(WeekOfCommitSchema[].class)
-                    .block();
-            return weekOfCommits != null ?
-                    weekOfCommitSchemaMapper.mapList(Arrays.asList(weekOfCommits)) :
-                    List.of();
+            var pagedIterable = gitHubApi.getRepository(fullName).getStatistics().getCommitActivity();
+            var commitActivity = fetchRecords(pagedIterable, 100);
+            return weekOfCommitSchemaMapper.mapList(commitActivity);
+        } catch (Exception exception) {
+            log.error(exception.getMessage());
+            return Collections.emptyList();
+        }
+    }
+
+    public List<ContributorDTO> findAllContributorsByRepoName(String fullName, int maxResults) {
+        try {
+            var pagedIterable = gitHubApi.getRepository(fullName).listContributors();
+            var collaborators = fetchRecords(pagedIterable, maxResults);
+            return contributorSchemaMapper.mapList(collaborators);
         } catch (Exception exception) {
             log.error(exception.getMessage());
             return List.of();
         }
     }
 
-    public List<ContributorDTO> findAllContributorsByRepoName(String fullName, int pageSize) {
+    public List<ReleaseDTO> findAllReleasesByRepoName(String fullName, int maxResults) {
         try {
-            ContributorSchema[] contributorSchemas = webClientBuilder.build()
-                    .get()
-                    .uri(String.format("%s/repos/%s/contributors?per_page=%s", GITHUB_URL, fullName, pageSize))
-                    .accept(APPLICATION_JSON_GITHUB)
-                    .headers(httpHeaders -> httpHeaders.setBearerAuth(apiToken))
-                    .retrieve()
-                    .bodyToMono(ContributorSchema[].class)
-                    .block();
-
-            return contributorSchemas != null ?
-                    contributorSchemaMapper.mapList(Arrays.asList(contributorSchemas)) :
-                    List.of();
-        } catch (WebClientResponseException exception) {
+            var pagedIterable = gitHubApi.getRepository(fullName).listReleases();
+            var releases = fetchRecords(pagedIterable, maxResults);
+            return releaseSchemaMapper.mapList(releases);
+        } catch (Exception exception) {
             log.error(exception.getMessage());
             return List.of();
         }
     }
 
-    public List<ReleaseDTO> findAllReleasesByRepoName(String fullName, int pageSize) {
-        try {
-            ReleaseSchema[] releaseSchemas = webClientBuilder.build()
-                    .get()
-                    .uri(String.format("%s/repos/%s/releases?per_page=%s", GITHUB_URL, fullName, pageSize))
-                    .accept(APPLICATION_JSON_GITHUB)
-                    .headers(httpHeaders -> httpHeaders.setBearerAuth(apiToken))
-                    .retrieve()
-                    .bodyToMono(ReleaseSchema[].class)
-                    .block();
-            return releaseSchemas != null ?
-                    releaseSchemaMapper.mapList(Arrays.asList(releaseSchemas)) :
-                    List.of();
-        } catch (WebClientResponseException exception) {
-            log.error(exception.getMessage());
-            return List.of();
+    private <T> List<T> fetchRecords(PagedIterable<T> pagedIterable, int maxResults) {
+        PagedIterator<T> iterator = pagedIterable._iterator(Math.min(100, maxResults));
+        List<T> record = new ArrayList<>();
+        for (int i = 1; i <= maxResults && iterator.hasNext(); i++) {
+            record.add(iterator.next());
         }
+        return record;
     }
 }

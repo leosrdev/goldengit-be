@@ -2,25 +2,31 @@ package com.goldengit.infra.api.github.mapper;
 
 import com.goldengit.application.dto.PullRequestDTO;
 import com.goldengit.application.mapper.SchemaMapper;
-import com.goldengit.infra.api.github.schema.PullRequestSchema;
+import org.kohsuke.github.GHPullRequest;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+
 @Component
-public class PullRequestSchemaMapper extends SchemaMapper<PullRequestSchema, PullRequestDTO> {
+public class PullRequestSchemaMapper extends SchemaMapper<GHPullRequest, PullRequestDTO> {
     @Override
-    public PullRequestDTO map(PullRequestSchema schema) {
-        return PullRequestDTO.builder()
-                .id(schema.id)
-                .number(schema.number)
-                .htmlUrl(schema.html_url)
-                .title(schema.title)
-                .state(schema.state)
-                .createdAt(schema.created_at)
-                .closedAt(schema.closed_at)
-                //.body(pullRequest.body)
-                .userLogin(schema.user.login)
-                .userHtmlUrl(schema.user.html_url)
-                .userAvatarUrl(schema.user.avatar_url)
-                .build();
+    public PullRequestDTO map(GHPullRequest schema) {
+        try {
+            return PullRequestDTO.builder()
+                    .id(schema.getId())
+                    .number(schema.getNumber())
+                    .htmlUrl(schema.getHtmlUrl().toString())
+                    .title(schema.getTitle())
+                    .state(schema.getState().toString().toLowerCase())
+                    .createdAt(dateFormat(schema.getCreatedAt()))
+                    .closedAt(dateFormat(schema.getClosedAt()))
+                    //.body(pullRequest.body)
+                    .userLogin(schema.getUser().getLogin())
+                    .userHtmlUrl(schema.getUser().getHtmlUrl().toString())
+                    .userAvatarUrl(schema.getUser().getAvatarUrl())
+                    .build();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

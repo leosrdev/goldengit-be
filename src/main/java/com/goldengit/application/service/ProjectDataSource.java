@@ -12,13 +12,13 @@ public interface ProjectDataSource {
 
     List<PullRequestDTO> findAllPullRequestByRepoName(String fullName);
 
-    List<PullRequestDTO> findAllPullRequestByRepoName(String fullName, int pageSize, String direction);
+    List<PullRequestDTO> findAllPullRequestByRepoName(String fullName, int maxResults);
 
     List<IssueDTO> findAllIssuesByRepoName(String fullName);
 
     List<WeekOfCommitDTO> getCommitActivity(String fullName);
 
-    List<ContributorDTO> findAllContributorsByRepoName(String fullName, int pageSize);
+    List<ContributorDTO> findAllContributorsByRepoName(String fullName, int maxResults);
 
     List<ReleaseDTO> findAllReleasesByRepoName(String fullName, int pageSize);
 }

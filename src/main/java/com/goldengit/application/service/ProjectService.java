@@ -10,7 +10,6 @@ import org.apache.coyote.BadRequestException;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -57,7 +56,7 @@ public class ProjectService extends BaseService {
     @Cacheable(value = "git-repositories", key = "'pullRequests:' + #uuid")
     public List<PullRequestDTO> findPullRequestByRepoUuid(String uuid) throws BadRequestException {
         Project project = getProjectByUUID(uuid);
-        return projectDataSource.findAllPullRequestByRepoName(project.getFullName(), 15, "desc");
+        return projectDataSource.findAllPullRequestByRepoName(project.getFullName(), 15);
     }
 
     @Cacheable(value = "git-repositories", key = "'popularRepositories'")
