@@ -1,6 +1,8 @@
 package com.goldengit.application.service;
 
 import com.goldengit.application.dto.*;
+import com.goldengit.application.query.FindIssueQuery;
+import org.kohsuke.github.GHIssueState;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +19,8 @@ public interface ProjectDataSource {
     List<PullRequestDTO> findMergedPullRequestByRepoName(String fullName, int maxResults);
 
     List<IssueDTO> findAllIssuesByRepoName(String fullName);
+
+    List<IssueDTO> findIssues(FindIssueQuery query);
 
     List<WeekOfCommitDTO> getCommitActivity(String fullName);
 

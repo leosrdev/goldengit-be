@@ -1,6 +1,7 @@
 package com.goldengit.infra.api.github.client;
 
 import com.goldengit.application.dto.*;
+import com.goldengit.application.query.FindIssueQuery;
 import com.goldengit.application.service.ProjectDataSource;
 import com.goldengit.infra.api.github.mapper.*;
 import lombok.RequiredArgsConstructor;
@@ -85,6 +86,23 @@ public class GitHubClient implements ProjectDataSource {
         try {
             var pagedIterable = gitHubApi.getRepository(fullName).queryIssues().list();
             var issues = fetchRecords(pagedIterable, 100);
+            return issueSchemaMapper.mapList(issues);
+        } catch (Exception exception) {
+            log.error(exception.getMessage());
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public List<IssueDTO> findIssues(FindIssueQuery query) {
+        try {
+            var repository = gitHubApi.getRepository(query.getRepositoryName());
+            var queryBuilder = repository.queryIssues();
+            if (query.getState() != null) {
+                queryBuilder.state(query.getState());
+            }
+            var pagedIterable = queryBuilder.list();
+            var issues = fetchRecords(pagedIterable, query.getMaxResults() > 0 ? query.getMaxResults() : 100);
             return issueSchemaMapper.mapList(issues);
         } catch (Exception exception) {
             log.error(exception.getMessage());

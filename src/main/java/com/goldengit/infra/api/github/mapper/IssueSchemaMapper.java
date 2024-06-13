@@ -15,7 +15,7 @@ public class IssueSchemaMapper extends SchemaMapper<GHIssue, IssueDTO> {
             return IssueDTO.builder()
                     .id(issue.getId())
                     .number(issue.getNumber())
-                    .body(issue.getBody())
+                    //.body(issue.getBody())
                     .state(issue.getState().toString().toLowerCase())
                     .title(issue.getTitle())
                     .createdAt(dateFormat(issue.getCreatedAt()))

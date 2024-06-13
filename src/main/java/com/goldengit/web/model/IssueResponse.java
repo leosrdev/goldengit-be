@@ -1,15 +1,11 @@
-package com.goldengit.application.dto;
+package com.goldengit.web.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Builder
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class IssueDTO {
+public class IssueResponse {
     public long id;
     public int number;
     public String title;
@@ -17,4 +13,5 @@ public class IssueDTO {
     public String body;
     public String createdAt;
     public String closedAt;
+    private float cycleTimeDays;
 }
