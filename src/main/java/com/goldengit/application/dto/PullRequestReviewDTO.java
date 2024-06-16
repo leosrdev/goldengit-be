@@ -5,21 +5,17 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Builder
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class IssueDTO {
-    public long id;
-    public int number;
-    public String title;
-    public String htmlUrl;
-    public String state;
-    public String body;
-    public String createdAt;
-    public String closedAt;
+@Data
+@Builder
+public class PullRequestReviewDTO {
+    private long pullRequestId;
+    private int pullRequestNumber;
     private String userLogin;
     private String userName;
-    private String userHtmlUrl;
     private String userAvatarUrl;
+    private String body;
+    private String submittedAt;
+    private String htmlUrl;
 }

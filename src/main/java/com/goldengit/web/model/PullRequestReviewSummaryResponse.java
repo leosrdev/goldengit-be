@@ -9,11 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ContributorResponse {
-    private long id;
+public class PullRequestReviewSummaryResponse {
     private String login;
-    private String name;
-    private String avatarUrl;
-    private String htmlUrl;
-    private long contributions;
+    private Long reviews;
 }

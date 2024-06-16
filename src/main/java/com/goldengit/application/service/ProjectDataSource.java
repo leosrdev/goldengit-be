@@ -17,6 +17,8 @@ public interface ProjectDataSource {
 
     List<PullRequestDTO> findMergedPullRequestByRepoName(String fullName, int maxResults);
 
+    public List<PullRequestReviewDTO> findPullRequestReviewsByRepoName(String fullName, int maxPullRequests);
+
     List<IssueDTO> findAllIssuesByRepoName(String fullName);
 
     List<IssueDTO> findIssues(FindIssueQuery query);

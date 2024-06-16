@@ -19,6 +19,7 @@ public class PullRequestDTO {
     private String state;
     private String body;
     private String userLogin;
+    private String userName;
     private String userHtmlUrl;
     private String userAvatarUrl;
 }

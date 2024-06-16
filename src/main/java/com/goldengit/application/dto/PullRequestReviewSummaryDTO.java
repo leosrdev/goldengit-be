@@ -9,11 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ContributorDTO {
-    private long id;
+public class PullRequestReviewSummaryDTO {
     private String login;
-    private String name;
-    private String avatarUrl;
-    private String htmlUrl;
-    private long contributions;
+    private Long reviews;
 }

@@ -1,15 +1,19 @@
 package com.goldengit.application.service;
 
+import com.goldengit.application.dto.IssueDTO;
 import com.goldengit.application.dto.ProjectDTO;
 import com.goldengit.application.dto.PullRequestDTO;
+import com.goldengit.application.query.FindIssueQuery;
 import com.goldengit.domain.model.Project;
 import com.goldengit.infra.db.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
+import org.kohsuke.github.GHIssueState;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -54,9 +58,20 @@ public class ProjectService extends BaseService {
     }
 
     @Cacheable(value = "git-repositories", key = "'pullRequests:' + #uuid")
-    public List<PullRequestDTO> findPullRequestByRepoUuid(String uuid) throws BadRequestException {
+    public List<PullRequestDTO> findLatestPullRequestByRepoUuid(String uuid) throws BadRequestException {
         Project project = getProjectByUUID(uuid);
-        return projectDataSource.findAllPullRequestByRepoName(project.getFullName(), 15);
+        return projectDataSource.findAllPullRequestByRepoName(project.getFullName(), 10);
+    }
+
+    @Cacheable(value = "git-repositories", key = "'issues:' + #uuid")
+    public List<IssueDTO> findLatestIssues(String uuid) throws BadRequestException {
+        Project project = getProjectByUUID(uuid);
+        var issues = projectDataSource.findIssues(
+                new FindIssueQuery(project.getFullName(), GHIssueState.OPEN, 10)
+        );
+        return issues.stream().parallel()
+                .sorted(Comparator.comparingInt(IssueDTO::getNumber))
+                .collect(Collectors.toList());
     }
 
     @Cacheable(value = "git-repositories", key = "'popularRepositories'")

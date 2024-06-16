@@ -133,7 +133,7 @@ public class ProjectControllerTest {
 
     @Test
     void shouldSearchRepositories() throws Exception {
-        when(projectService.findPullRequestByRepoUuid("uuid")).thenReturn(List.of(pullRequestDTO));
+        when(projectService.findLatestPullRequestByRepoUuid("uuid")).thenReturn(List.of(pullRequestDTO));
         MockHttpServletResponse response = mockMvc.perform(
                         get("/api/v1/repos/%s/pulls".formatted("uuid"))
                                 .contentType(MediaType.APPLICATION_JSON))

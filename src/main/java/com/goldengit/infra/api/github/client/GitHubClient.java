@@ -24,6 +24,7 @@ public class GitHubClient implements ProjectDataSource {
     private final GitHub gitHubApi;
     private final ProjectSchemaMapper projectSchemaMapper;
     private final PullRequestSchemaMapper pullRequestSchemaMapper;
+    private final PullRequestReviewSchemaMapper pullRequestReviewSchemaMapper;
     private final IssueSchemaMapper issueSchemaMapper;
     private final WeekOfCommitSchemaMapper weekOfCommitSchemaMapper;
     private final ContributorSchemaMapper contributorSchemaMapper;
@@ -76,6 +77,31 @@ public class GitHubClient implements ProjectDataSource {
                     .searchPullRequests().isMerged().list();
             var pulls = fetchRecords(pagedIterable, maxResults);
             return pullRequestSchemaMapper.mapList(pulls);
+        } catch (Exception exception) {
+            log.error(exception.getMessage());
+            return Collections.emptyList();
+        }
+    }
+
+    public List<PullRequestReviewDTO> findPullRequestReviewsByRepoName(String fullName, int maxPullRequests) {
+        try {
+            PagedIterable<GHPullRequest> pagedIterable = gitHubApi.getRepository(fullName)
+                    .searchPullRequests().isMerged().list();
+            var pullRequests = fetchRecords(pagedIterable, maxPullRequests);
+
+            List<PullRequestReviewDTO> reviews = new ArrayList<>();
+            pullRequests.stream().parallel().forEach(pullRequest -> {
+                var pagedIterableReview = pullRequest.listReviews();
+                var reviewsList = fetchRecords(pagedIterableReview, 10);
+                var reviewsDTO = pullRequestReviewSchemaMapper.mapList(reviewsList);
+                for (PullRequestReviewDTO dto : reviewsDTO) {
+                    dto.setPullRequestId(pullRequest.getId());
+                    dto.setPullRequestNumber(pullRequest.getNumber());
+                }
+                reviews.addAll(reviewsDTO);
+            });
+
+            return reviews;
         } catch (Exception exception) {
             log.error(exception.getMessage());
             return Collections.emptyList();

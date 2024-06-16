@@ -1,12 +1,8 @@
 package com.goldengit.web.controller;
 
 import com.goldengit.application.service.EngagementService;
-import com.goldengit.web.mapper.ContributorResponseMapper;
-import com.goldengit.web.mapper.IssueResponseMapper;
-import com.goldengit.web.mapper.PullRequestResponseMapper;
-import com.goldengit.web.model.ContributorResponse;
-import com.goldengit.web.model.IssueResponse;
-import com.goldengit.web.model.PullRequestResponse;
+import com.goldengit.web.mapper.*;
+import com.goldengit.web.model.*;
 import lombok.AllArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
@@ -26,6 +22,8 @@ public class EngagementController {
     private final EngagementService engagementService;
     private final ContributorResponseMapper contributorResponseMapper;
     private final PullRequestResponseMapper pullRequestResponseMapper;
+    private final PullRequestReviewResponseMapper pullRequestReviewResponseMapper;
+    private final PullRequestReviewSummaryResponseMapper pullRequestReviewSummaryResponseMapper;
     private final IssueResponseMapper issueResponseMapper;
 
     @GetMapping(value = "/{uuid}/engagement/contributors", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -45,6 +43,28 @@ public class EngagementController {
             var pullRequests = engagementService.findMergedPullRequests(uuid);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(pullRequestResponseMapper.mapList(pullRequests));
+        } catch (BadRequestException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping(value = "/{uuid}/engagement/pull-request-reviews", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<PullRequestReviewResponse>> findPullRequestReviewsForRepo(@PathVariable("uuid") String uuid) {
+        try {
+            var reviews = engagementService.findPullRequestReviewsForRepo(uuid);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(pullRequestReviewResponseMapper.mapList(reviews));
+        } catch (BadRequestException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping(value = "/{uuid}/engagement/pull-reviews-summary", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<PullRequestReviewSummaryResponse>> getPullRequestReviewsSummaryForRepo(@PathVariable("uuid") String uuid) {
+        try {
+            var summary = engagementService.getPullRequestReviewsSummaryForRepo(uuid);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(pullRequestReviewSummaryResponseMapper.mapList(summary));
         } catch (BadRequestException e) {
             return ResponseEntity.badRequest().build();
         }

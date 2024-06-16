@@ -10,20 +10,21 @@ import java.io.IOException;
 @Component
 public class PullRequestSchemaMapper extends SchemaMapper<GHPullRequest, PullRequestDTO> {
     @Override
-    public PullRequestDTO map(GHPullRequest schema) {
+    public PullRequestDTO map(GHPullRequest pullRequest) {
         try {
             return PullRequestDTO.builder()
-                    .id(schema.getId())
-                    .number(schema.getNumber())
-                    .htmlUrl(schema.getHtmlUrl().toString())
-                    .title(schema.getTitle())
-                    .state(schema.getState().toString().toLowerCase())
-                    .createdAt(dateFormat(schema.getCreatedAt()))
-                    .closedAt(dateFormat(schema.getClosedAt()))
+                    .id(pullRequest.getId())
+                    .number(pullRequest.getNumber())
+                    .htmlUrl(pullRequest.getHtmlUrl().toString())
+                    .title(pullRequest.getTitle())
+                    .state(pullRequest.getState().toString().toLowerCase())
+                    .createdAt(dateFormat(pullRequest.getCreatedAt()))
+                    .closedAt(dateFormat(pullRequest.getClosedAt()))
                     //.body(pullRequest.body)
-                    .userLogin(schema.getUser().getLogin())
-                    .userHtmlUrl(schema.getUser().getHtmlUrl().toString())
-                    .userAvatarUrl(schema.getUser().getAvatarUrl())
+                    .userLogin(pullRequest.getUser().getLogin())
+                    .userName(pullRequest.getUser().getName())
+                    .userHtmlUrl(pullRequest.getUser().getHtmlUrl().toString())
+                    .userAvatarUrl(pullRequest.getUser().getAvatarUrl())
                     .build();
         } catch (IOException e) {
             throw new RuntimeException(e);

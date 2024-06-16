@@ -5,16 +5,23 @@ import com.goldengit.application.mapper.SchemaMapper;
 import org.kohsuke.github.GHRepository;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+
 @Component
 public class ContributorSchemaMapper extends SchemaMapper<GHRepository.Contributor, ContributorDTO> {
     @Override
     protected ContributorDTO map(GHRepository.Contributor contributor) {
-        return ContributorDTO.builder()
-                .id(contributor.getId())
-                .login(contributor.getLogin())
-                .avatarUrl(contributor.getAvatarUrl())
-                .htmlUrl(contributor.getHtmlUrl().toString())
-                .contributions(contributor.getContributions())
-                .build();
+        try {
+            return ContributorDTO.builder()
+                    .id(contributor.getId())
+                    .login(contributor.getLogin())
+                    .name(contributor.getName())
+                    .avatarUrl(contributor.getAvatarUrl())
+                    .htmlUrl(contributor.getHtmlUrl().toString())
+                    .contributions(contributor.getContributions())
+                    .build();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
