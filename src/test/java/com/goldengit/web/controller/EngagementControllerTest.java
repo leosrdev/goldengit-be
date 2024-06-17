@@ -6,9 +6,7 @@ import com.goldengit.application.dto.IssueDTO;
 import com.goldengit.application.dto.PullRequestDTO;
 import com.goldengit.application.service.EngagementService;
 import com.goldengit.infra.config.WebConfig;
-import com.goldengit.web.mapper.ContributorResponseMapper;
-import com.goldengit.web.mapper.IssueResponseMapper;
-import com.goldengit.web.mapper.PullRequestResponseMapper;
+import com.goldengit.web.mapper.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +30,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
         EngagementService.class,
         ContributorResponseMapper.class,
         PullRequestResponseMapper.class,
+        PullRequestReviewResponseMapper.class,
         IssueResponseMapper.class,
+        ReviewerResponseMapper.class,
         EngagementController.class,
         ObjectMapper.class
 })
@@ -58,6 +58,8 @@ public class EngagementControllerTest {
     @Autowired
     private IssueResponseMapper issueResponseMapper;
 
+    @Autowired
+    private PullRequestReviewResponseMapper pullRequestReviewResponseMapper;
 
     @BeforeEach
     void setup() {

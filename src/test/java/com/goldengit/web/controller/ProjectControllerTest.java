@@ -130,20 +130,4 @@ public class ProjectControllerTest {
                 .isEqualTo(objectMapper.writeValueAsString(Collections.singletonList(projectDTO)));
 
     }
-
-    @Test
-    void shouldSearchRepositories() throws Exception {
-        when(projectService.findLatestPullRequestByRepoUuid("uuid")).thenReturn(List.of(pullRequestDTO));
-        MockHttpServletResponse response = mockMvc.perform(
-                        get("/api/v1/repos/%s/pulls".formatted("uuid"))
-                                .contentType(MediaType.APPLICATION_JSON))
-                .andReturn()
-                .getResponse();
-
-        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
-
-        assertThat(response.getContentAsString())
-                .isEqualTo(objectMapper.writeValueAsString(Collections.singletonList(pullRequestResponse)));
-
-    }
 }

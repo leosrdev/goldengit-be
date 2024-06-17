@@ -1,8 +1,8 @@
 package com.goldengit.web.controller;
 
-import com.goldengit.application.service.EngagementService;
 import com.goldengit.application.service.ProjectService;
-import com.goldengit.web.mapper.*;
+import com.goldengit.web.mapper.IssueResponseMapper;
+import com.goldengit.web.mapper.PullRequestResponseMapper;
 import com.goldengit.web.model.IssueResponse;
 import com.goldengit.web.model.PullRequestResponse;
 import lombok.AllArgsConstructor;
@@ -20,12 +20,8 @@ import java.util.List;
 @RequestMapping("/api/v1/repos")
 @AllArgsConstructor
 public class WorkInProgressController {
-    private final EngagementService engagementService;
     private final ProjectService projectService;
-    private final ContributorResponseMapper contributorResponseMapper;
     private final PullRequestResponseMapper pullRequestResponseMapper;
-    private final PullRequestReviewResponseMapper pullRequestReviewResponseMapper;
-    private final ReviewerResponseMapper reviewerResponseMapper;
     private final IssueResponseMapper issueResponseMapper;
 
     @GetMapping("/{uuid}/pulls")
