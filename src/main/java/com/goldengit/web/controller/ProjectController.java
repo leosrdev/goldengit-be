@@ -2,15 +2,15 @@ package com.goldengit.web.controller;
 
 import com.goldengit.application.service.ProjectService;
 import com.goldengit.web.mapper.ProjectResponseMapper;
-import com.goldengit.web.mapper.PullRequestResponseMapper;
 import com.goldengit.web.model.ProjectResponse;
-import com.goldengit.web.model.PullRequestResponse;
 import lombok.AllArgsConstructor;
-import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -30,7 +30,7 @@ public class ProjectController {
         return ResponseEntity.ok().body(responses);
     }
 
-     @GetMapping(value = "/popular", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/popular", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<ProjectResponse>> listPopularRepositories() {
         var projects = projectService.listPopularProjects();
         return ResponseEntity.status(HttpStatus.OK)

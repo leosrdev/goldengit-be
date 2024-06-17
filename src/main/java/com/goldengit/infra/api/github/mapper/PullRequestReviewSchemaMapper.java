@@ -1,9 +1,7 @@
 package com.goldengit.infra.api.github.mapper;
 
-import com.goldengit.application.dto.PullRequestDTO;
 import com.goldengit.application.dto.PullRequestReviewDTO;
 import com.goldengit.application.mapper.SchemaMapper;
-import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHPullRequestReview;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +16,7 @@ public class PullRequestReviewSchemaMapper extends SchemaMapper<GHPullRequestRev
                     .userLogin(review.getUser().getLogin())
                     .userAvatarUrl(review.getUser().getAvatarUrl())
                     .userName(review.getUser().getName())
+                    .userHtmlUrl(review.getUser().getHtmlUrl().toString())
                     //.body(review.getBody())
                     .submittedAt(dateFormat(review.getSubmittedAt()))
                     .htmlUrl(review.getHtmlUrl().toString())

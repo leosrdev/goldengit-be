@@ -9,7 +9,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PullRequestReviewSummaryResponse {
+public class ReviewerResponse {
     private String login;
+    private String name;
+    private String avatarUrl;
+    private String htmlUrl;
     private Long reviews;
 }

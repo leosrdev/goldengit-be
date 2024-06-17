@@ -15,6 +15,7 @@ public class PullRequestReviewDTO {
     private String userLogin;
     private String userName;
     private String userAvatarUrl;
+    private String userHtmlUrl;
     private String body;
     private String submittedAt;
     private String htmlUrl;

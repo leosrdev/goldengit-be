@@ -3,7 +3,8 @@ package com.goldengit.web.controller;
 import com.goldengit.application.service.EngagementService;
 import com.goldengit.application.service.ProjectService;
 import com.goldengit.web.mapper.*;
-import com.goldengit.web.model.*;
+import com.goldengit.web.model.IssueResponse;
+import com.goldengit.web.model.PullRequestResponse;
 import lombok.AllArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
@@ -24,7 +25,7 @@ public class WorkInProgressController {
     private final ContributorResponseMapper contributorResponseMapper;
     private final PullRequestResponseMapper pullRequestResponseMapper;
     private final PullRequestReviewResponseMapper pullRequestReviewResponseMapper;
-    private final PullRequestReviewSummaryResponseMapper pullRequestReviewSummaryResponseMapper;
+    private final ReviewerResponseMapper reviewerResponseMapper;
     private final IssueResponseMapper issueResponseMapper;
 
     @GetMapping("/{uuid}/pulls")

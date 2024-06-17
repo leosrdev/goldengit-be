@@ -9,9 +9,10 @@ import org.kohsuke.github.GHIssueState;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,29 +36,47 @@ public class EngagementService extends BaseService {
                 .collect(Collectors.toList());
     }
 
+    @Cacheable(value = "git-repositories", key = "'pull-reviews:' + #uuid")
     public List<PullRequestReviewDTO> findPullRequestReviewsForRepo(String uuid) throws BadRequestException {
         Project project = projectService.getProjectByUUID(uuid);
-        var reviews = projectDataSource.findPullRequestReviewsByRepoName(project.getFullName(), 100);
+        var reviews = projectDataSource.findPullRequestReviewsByRepoName(project.getFullName(), 50);
         return reviews.stream().parallel()
                 .sorted(Comparator.comparingInt(PullRequestReviewDTO::getPullRequestNumber))
                 .collect(Collectors.toList());
     }
 
-    public List<PullRequestReviewSummaryDTO> getPullRequestReviewsSummaryForRepo(String uuid) throws BadRequestException {
+    @Cacheable(value = "git-repositories", key = "'reviews-summary:' + #uuid")
+    public List<ReviewerDTO> getPullRequestReviewsSummaryForRepo(String uuid) throws BadRequestException {
         Project project = projectService.getProjectByUUID(uuid);
-        var reviews = projectDataSource.findPullRequestReviewsByRepoName(project.getFullName(), 100);
-        var reviewGroupedByUser =  reviews.stream().parallel()
+        var reviews = projectDataSource.findPullRequestReviewsByRepoName(project.getFullName(), 50);
+
+        Map<String, PullRequestReviewDTO> reviewsMap = reviews.stream()
+                .collect(Collectors.toMap(
+                        PullRequestReviewDTO::getUserLogin,
+                        review -> review,
+                        (existing, replacement) -> existing,
+                        HashMap::new
+                ));
+
+        var reviewGroupedByLogin = reviews.stream().parallel()
                 .collect(Collectors.groupingByConcurrent(
                         PullRequestReviewDTO::getUserLogin,
                         Collectors.counting()
                 ));
 
-        return reviewGroupedByUser.entrySet().stream()
-                .map(entry -> PullRequestReviewSummaryDTO.builder()
-                        .login(entry.getKey())
-                        .reviews(entry.getValue())
-                        .build())
-                .sorted(Comparator.comparing(PullRequestReviewSummaryDTO::getReviews).reversed())
+        return reviewGroupedByLogin.entrySet().stream()
+                .map(entry -> {
+                    var pullRequestReviewDTO = reviewsMap.get(entry.getKey());
+                    return ReviewerDTO.builder()
+                            .login(entry.getKey())
+                            .reviews(entry.getValue())
+                            .name(pullRequestReviewDTO.getUserName())
+                            .avatarUrl(pullRequestReviewDTO.getUserAvatarUrl())
+                            .htmlUrl(pullRequestReviewDTO.getUserHtmlUrl())
+                            .build();
+                })
+                .sorted(Comparator.comparing(ReviewerDTO::getReviews).reversed())
+                .limit(10)
                 .collect(Collectors.toList());
     }
 

@@ -23,7 +23,7 @@ public class EngagementController {
     private final ContributorResponseMapper contributorResponseMapper;
     private final PullRequestResponseMapper pullRequestResponseMapper;
     private final PullRequestReviewResponseMapper pullRequestReviewResponseMapper;
-    private final PullRequestReviewSummaryResponseMapper pullRequestReviewSummaryResponseMapper;
+    private final ReviewerResponseMapper reviewerResponseMapper;
     private final IssueResponseMapper issueResponseMapper;
 
     @GetMapping(value = "/{uuid}/engagement/contributors", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -60,11 +60,11 @@ public class EngagementController {
     }
 
     @GetMapping(value = "/{uuid}/engagement/pull-reviews-summary", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<PullRequestReviewSummaryResponse>> getPullRequestReviewsSummaryForRepo(@PathVariable("uuid") String uuid) {
+    public ResponseEntity<List<ReviewerResponse>> getPullRequestReviewsSummaryForRepo(@PathVariable("uuid") String uuid) {
         try {
             var summary = engagementService.getPullRequestReviewsSummaryForRepo(uuid);
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(pullRequestReviewSummaryResponseMapper.mapList(summary));
+                    .body(reviewerResponseMapper.mapList(summary));
         } catch (BadRequestException e) {
             return ResponseEntity.badRequest().build();
         }
