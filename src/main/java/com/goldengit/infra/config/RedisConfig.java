@@ -32,8 +32,8 @@ public class RedisConfig {
 
         return RedisCacheManager.builder(redisConnectionFactory())
                 .cacheDefaults(cacheConfig)
-                .withCacheConfiguration("git-repositories", redisDefaultCacheConfig(Duration.ofHours(1)))
-                .withCacheConfiguration("git-metrics", redisDefaultCacheConfig(Duration.ofHours(1)))
+                .withCacheConfiguration("git-repositories", redisDefaultCacheConfig(Duration.ofDays(1)))
+                .withCacheConfiguration("git-metrics", redisDefaultCacheConfig(Duration.ofDays(1)))
                 .withCacheConfiguration("users", redisDefaultCacheConfig(Duration.ofHours(3)))
                 .withCacheConfiguration("ai-generation", redisDefaultCacheConfig(Duration.ofDays(3)))
                 .build();
