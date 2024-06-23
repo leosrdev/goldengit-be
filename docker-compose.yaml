@@ -1,7 +1,7 @@
 version: '3.1'
 services:
 
-  mysql:
+  mysql-server:
     image: mysql:8.4.0
     ports:
       - "3306:3306"
@@ -16,7 +16,7 @@ services:
     volumes:
       - redis_data:/data
 
-  rabbitmq:
+  rabbitmq-server:
     image: rabbitmq:3.13.2-management
     container_name: 'rabbitmq'
     ports:
