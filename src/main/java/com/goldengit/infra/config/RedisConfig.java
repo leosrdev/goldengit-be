@@ -36,7 +36,7 @@ public class RedisConfig {
                 .withCacheConfiguration("git-metrics", redisDefaultCacheConfig(Duration.ofDays(1)))
                 .withCacheConfiguration("users", redisDefaultCacheConfig(Duration.ofHours(3)))
                 .withCacheConfiguration("ai-generation", redisDefaultCacheConfig(Duration.ofDays(3)))
-                .withCacheConfiguration("jwt-tokens", redisDefaultCacheConfig(Duration.ofMinutes(50)))
+                .withCacheConfiguration("jwt-tokens", redisDefaultCacheConfig(Duration.ofHours(1)))
                 .build();
     }
 
