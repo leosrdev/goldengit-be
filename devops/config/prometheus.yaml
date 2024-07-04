@@ -1,0 +1,8 @@
+scrape_configs:
+  - job_name: 'GoldenGit Application input'
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 6s
+    static_configs:
+      - targets: ['localhost:9000']
+        labels:
+          application: 'GoldenGit Application'

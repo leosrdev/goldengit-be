@@ -1,12 +1,25 @@
 version: '3.1'
 services:
-
-  jenkins:
-    image: jenkins/jenkins:lts
-    ports:
-      - "8081:8080"
-      - "50000:50000"
+  prometheus:
+    image: prom/prometheus:v2.45.6
+    network_mode: host
+    container_name: prometheus
+    restart: unless-stopped
     volumes:
-      - jenkins_data:/var/jenkins_home
+      - ./config:/etc/prometheus/
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yaml'
+
+  grafana:
+    image: grafana/grafana-oss:9.5.20
+    network_mode: host
+    container_name: grafana
+    restart: unless-stopped
+    volumes:
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
+      - GF_SERVER_DOMAIN=${GF_SERVER_DOMAIN}
+
 volumes:
-  jenkins_data:
+  grafana_data:
