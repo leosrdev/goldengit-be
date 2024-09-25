@@ -3,6 +3,7 @@ services:
 
   mysql-server:
     image: mysql:8.4.0
+    env_file: "goldengit.env"
     deploy:
       placement:
         constraints:
@@ -20,6 +21,7 @@ services:
 
   redis-server:
     image: redis:7.2.4
+    env_file: "goldengit.env"
     deploy:
       placement:
         constraints:
@@ -37,6 +39,7 @@ services:
 
   rabbitmq-server:
     image: rabbitmq:3.13.2-management
+    env_file: "goldengit.env"
     deploy:
       placement:
         constraints:
