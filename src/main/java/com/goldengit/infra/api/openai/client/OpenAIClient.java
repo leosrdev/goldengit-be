@@ -28,7 +28,7 @@ public class OpenAIClient {
         }
 
         ChatResponse response = chatModel.call(new Prompt(new UserMessage(message.toString())));
-        return response.getResult().getOutput().getContent();
+        return response.getResult().getOutput().getText();
     }
 
     public String generateProjectDescription(String projectName) {
@@ -36,6 +36,6 @@ public class OpenAIClient {
         message.append("Write a 80-words description about the %s project on GitHub, ".formatted(projectName));
         message.append("do not use technical terms or abbreviations");
         ChatResponse response = chatModel.call(new Prompt(new UserMessage(message.toString())));
-        return response.getResult().getOutput().getContent();
+        return response.getResult().getOutput().getText();
     }
 }
