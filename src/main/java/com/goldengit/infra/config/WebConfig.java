@@ -14,7 +14,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:3000", "https://goldengit.com")
+                .allowedOrigins("http://localhost:3000", "https://goldengit.com", "https://www.goldengit.com")
                 .allowedMethods("GET", "POST")
                 .maxAge(3600);
     }
