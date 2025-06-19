@@ -2,6 +2,11 @@
 
 **GoldenGit** is a tool designed to provide invaluable insights into GitHub repositories, aiding developers in making informed decisions about repository adoption.
 
+
+![goldengit-diagram](https://github.com/user-attachments/assets/85f0ff31-4ee2-42ea-a845-8da4b3a3a644)
+
+
+
 ## Prerequisites
 - Java 17 or higher installed on your system.
 - Maven installed to build and run the project.
@@ -11,10 +16,10 @@ Set the following env vars to run the application locally:
 
 | Variable                 | Description                                  |
 |--------------------------|----------------------------------------------|
-| ```GITHUB_API_TOKEN```   | The API token used to consume the GitHub API |
-| ```MYSQL_USER```         | The MySQL username                           |
-| ```MYSQL_PASSWORD```     | The MySQL password                           |
-| ```OPENAI_API_KEY```     | The key used to consume the OpenAI API       |
+| GITHUB_API_TOKEN   | The API token used to consume the GitHub API |
+| MYSQL_USER         | The MySQL username                           |
+| MYSQL_PASSWORD     | The MySQL password                           |
+| OPENAI_API_KEY     | The key used to consume the OpenAI API       |
 
 ## Docker compose
 Run the Docker compose with the environment variables defined inside the docker-compose.yaml file
