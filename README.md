@@ -48,6 +48,109 @@ Run the application passing the ```dev``` profile to Spring, for example:
 
 ```java -jar goldengit-0.0.1-SNAPSHOT.jar  --spring.profiles.active=dev```
 
+# Project structure
+
+## 1. [`application`](https://github.com/leosrdev/goldengit-be/tree/ccd47fca74b7fb5384c2998945ac508052340ec9/src/main/java/com/goldengit/application)
+
+This layer typically includes service logic, DTOs, queries, and mapping/validation utilities.
+
+### Subfolders:
+
+- **[dto](https://github.com/leosrdev/goldengit-be/tree/ccd47fca74b7fb5384c2998945ac508052340ec9/src/main/java/com/goldengit/application/dto)**
+  - *Technologies*: Java classes (POJOs), Lombok (for getters/setters), and possibly validation annotations (`javax.validation`).
+  - *Purpose*: Data Transfer Objects (DTOs) used for communication between layers.
+
+- **[mapper](https://github.com/leosrdev/goldengit-be/tree/ccd47fca74b7fb5384c2998945ac508052340ec9/src/main/java/com/goldengit/application/mapper)**
+  - *Technologies*: MapStruct (for type-safe mapping), or manual mapping utilities.
+  - *Purpose*: Converts between domain models and DTOs.
+
+- **[query](https://github.com/leosrdev/goldengit-be/tree/ccd47fca74b7fb5384c2998945ac508052340ec9/src/main/java/com/goldengit/application/query)**
+  - *Technologies*: Java, sometimes QueryDSL, or custom classes for encapsulating search/filter logic.
+  - *Purpose*: Query objects or specifications for flexible searching/filtering.
+
+- **[service](https://github.com/leosrdev/goldengit-be/tree/ccd47fca74b7fb5384c2998945ac508052340ec9/src/main/java/com/goldengit/application/service)**
+  - *Technologies*: Spring `@Service` annotations, Java, possible use of transactional annotations.
+  - *Purpose*: Business logic and orchestration between domain and web layers.
+
+- **[validation](https://github.com/leosrdev/goldengit-be/tree/ccd47fca74b7fb5384c2998945ac508052340ec9/src/main/java/com/goldengit/application/validation)**
+  - *Technologies*: Java, Bean Validation (`javax.validation` or `jakarta.validation`), Spring Validators.
+  - *Purpose*: Custom validation logic for DTOs and commands.
+
+---
+
+## 2. [`domain`](https://github.com/leosrdev/goldengit-be/tree/ccd47fca74b7fb5384c2998945ac508052340ec9/src/main/java/com/goldengit/domain)
+
+This is the heart of business rules and domain logic.
+
+### Subfolders:
+
+- **[common](https://github.com/leosrdev/goldengit-be/tree/ccd47fca74b7fb5384c2998945ac508052340ec9/src/main/java/com/goldengit/domain/common)**
+  - *Technologies*: Java, Utility classes, possibly interfaces for domain events.
+  - *Purpose*: Shared domain utilities, constants, or base classes.
+
+- **[exception](https://github.com/leosrdev/goldengit-be/tree/ccd47fca74b7fb5384c2998945ac508052340ec9/src/main/java/com/goldengit/domain/exception)**
+  - *Technologies*: Java, custom exception classes.
+  - *Purpose*: Domain-specific exceptions.
+
+- **[model](https://github.com/leosrdev/goldengit-be/tree/ccd47fca74b7fb5384c2998945ac508052340ec9/src/main/java/com/goldengit/domain/model)**
+  - *Technologies*: Java, JPA annotations (for entities), Lombok, Value Objects and Aggregates.
+  - *Purpose*: Core domain models/entities and value objects.
+
+---
+
+## 3. [`infra`](https://github.com/leosrdev/goldengit-be/tree/ccd47fca74b7fb5384c2998945ac508052340ec9/src/main/java/com/goldengit/infra)
+
+Infrastructure layer: technical concerns, integration with external systems.
+
+### Subfolders:
+
+- **[api](https://github.com/leosrdev/goldengit-be/tree/ccd47fca74b7fb5384c2998945ac508052340ec9/src/main/java/com/goldengit/infra/api)**
+  - *Technologies*: Java, Spring WebClient/RestTemplate, Feign clients, OpenAPI, etc.
+  - *Purpose*: Integrations with external APIs.
+
+- **[config](https://github.com/leosrdev/goldengit-be/tree/ccd47fca74b7fb5384c2998945ac508052340ec9/src/main/java/com/goldengit/infra/config)**
+  - *Technologies*: Spring `@Configuration`, Java, application properties.
+  - *Purpose*: Configuration classes for beans, security, scheduling, etc.
+
+- **[db](https://github.com/leosrdev/goldengit-be/tree/ccd47fca74b7fb5384c2998945ac508052340ec9/src/main/java/com/goldengit/infra/db)**
+  - *Technologies*: Spring Data JPA, Hibernate, Liquibase/Flyway, native queries.
+  - *Purpose*: Data access logic, repositories, migration scripts.
+
+---
+
+## 4. [`web`](https://github.com/leosrdev/goldengit-be/tree/ccd47fca74b7fb5384c2998945ac508052340ec9/src/main/java/com/goldengit/web)
+
+Web layer: incoming HTTP requests, controllers, filters.
+
+### Subfolders:
+
+- **[controller](https://github.com/leosrdev/goldengit-be/tree/ccd47fca74b7fb5384c2998945ac508052340ec9/src/main/java/com/goldengit/web/controller)**
+  - *Technologies*: Spring MVC (`@RestController`, `@RequestMapping`), Java.
+  - *Purpose*: REST API endpoints.
+
+- **[filter](https://github.com/leosrdev/goldengit-be/tree/ccd47fca74b7fb5384c2998945ac508052340ec9/src/main/java/com/goldengit/web/filter)**
+  - *Technologies*: Java, Servlet Filters, Spring `OncePerRequestFilter`.
+  - *Purpose*: HTTP request/response filtering, security, logging.
+
+- **[mapper](https://github.com/leosrdev/goldengit-be/tree/ccd47fca74b7fb5384c2998945ac508052340ec9/src/main/java/com/goldengit/web/mapper)**
+  - *Technologies*: Java, MapStruct, custom mappers.
+  - *Purpose*: Web-specific model mapping.
+
+- **[model](https://github.com/leosrdev/goldengit-be/tree/ccd47fca74b7fb5384c2998945ac508052340ec9/src/main/java/com/goldengit/web/model)**
+  - *Technologies*: Java, DTOs for API requests/responses, validation annotations.
+  - *Purpose*: Web-facing models, request and response objects.
+
+---
+
+## Summary Table
+
+| Layer         | Technologies                          | Responsibilities                       |
+|---------------|---------------------------------------|----------------------------------------|
+| application   | Java, Spring, Lombok, MapStruct       | Service logic, DTOs, mapping, validation|
+| domain        | Java, JPA, Lombok                    | Core business logic, entities, exceptions|
+| infra         | Spring Data, Config, APIs, DB         | Persistence, configuration, integrations|
+| web           | Spring MVC, Filters                   | REST endpoints, request/response models |
+
 # Tech Stack
 
 ## Core Platform & Language
