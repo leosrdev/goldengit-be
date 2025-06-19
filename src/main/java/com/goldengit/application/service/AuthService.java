@@ -50,7 +50,7 @@ public class AuthService {
         Map<String, Object> claims = new HashMap<>();
         return Jwts.builder().claims(claims).subject(userName)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(Date.from(Instant.now().plusSeconds(3600*3)))
+                .expiration(Date.from(Instant.now().plusSeconds(3600*24*7)))
                 .signWith(getSecretKey())
                 .compact();
     }
