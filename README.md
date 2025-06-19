@@ -48,3 +48,81 @@ Run the application passing the ```dev``` profile to Spring, for example:
 
 ```java -jar goldengit-0.0.1-SNAPSHOT.jar  --spring.profiles.active=dev```
 
+# Tech Stack
+
+## Core Platform & Language
+- **Java**: 17
+- **Spring Boot**: 3.2.5
+
+## Spring Boot Starters
+- spring-boot-starter-web
+- spring-boot-starter-security
+- spring-boot-starter-webflux
+- spring-boot-starter-data-jpa
+- spring-boot-starter-data-redis
+- spring-boot-starter-amqp
+- spring-boot-starter-mail
+- spring-boot-starter-validation
+- spring-boot-starter-test
+- spring-boot-starter-actuator
+
+## Database
+- **MySQL** (mysql-connector-j)
+
+## ORM
+- **JPA** (via spring-boot-starter-data-jpa)
+
+## Redis
+- **Spring Data Redis** (spring-boot-starter-data-redis)
+
+## Messaging
+- **AMQP** (via spring-boot-starter-amqp, likely RabbitMQ)
+
+## Email
+- **JavaMail** (spring-boot-starter-mail)
+
+## Validation
+- **Hibernate Validator** (spring-boot-starter-validation)
+
+## Testing
+- **JUnit, Mockito, etc.** (spring-boot-starter-test)
+
+## Monitoring & Metrics
+- **Actuator** (spring-boot-starter-actuator)
+- **Micrometer Prometheus Registry**: micrometer-registry-prometheus
+
+## API Documentation
+- **OpenAPI/Swagger UI**: springdoc-openapi-starter-webmvc-ui: 2.5.0
+
+## AI Integration
+- **spring-ai-starter-model-openai**
+- **spring-ai-bom**: 1.0.0-SNAPSHOT
+
+## Dependency Injection and Utilities
+- **Lombok**: 1.18.30
+
+## API Rate Limiting
+- **Bucket4j**: bucket4j_jdk17-core: 8.12.0
+
+## YAML Processing
+- **SnakeYAML**: 2.0
+
+## JWT Authentication
+- **jjwt-api**: 0.12.6
+- **jjwt-impl**: 0.12.6
+- **jjwt-jackson**: 0.12.6
+
+## GitHub API Integration
+- **github-api**: 1.321
+
+## Miscellaneous
+- **com.zliio.disposable: disposable**: 1.0
+
+## Build Plugins
+- **spring-boot-maven-plugin**
+- **maven-compiler-plugin**: 3.11.0
+
+## Repositories
+- Spring Milestones
+- Spring Snapshots
+
